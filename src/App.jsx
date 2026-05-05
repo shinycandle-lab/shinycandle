@@ -1973,30 +1973,9 @@ function CheckoutModal({cart,D,commit,onClose,onDone}){
 
 // ─── Acceso rápido al panel ───────────────────────────────────────────────────
 export default function App(){
-  const[D,setD]=useState(null);
-  const[view,setView]=useState('web');
-  const lastSave=useRef(0);
-  const load=useCallback(async()=>{
-    if(Date.now()-lastSave.current<4000)return;
-    const saved=await dbRead();
-    if(saved)setD(saved);
-    else{await dbWrite(SEED);setD(SEED);}
-  },[]);
-  const commit=useCallback(async(newD)=>{
-    lastSave.current=Date.now();
-    setD(newD);
-    dbWrite(newD);
-  },[]);
-  useEffect(()=>{load();},[]);
-  useEffect(()=>{const id=setInterval(load,6000);return()=>clearInterval(id);},[load]);
-  if(!D)return(
-    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:'#0B0B0B',fontFamily:"'Playfair Display',serif",color:'#C9A96E',fontSize:22}}>
-      Cargando ShinyCandle...
-    </div>
-  );
   return(
     <>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Nunito:wght@300;400;500;600&display=swap')
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Nunito:wght@300;400;500;600&display=swap');*{box-sizing:border-box;margin:0;padding:0}select option{background:#1D1D1D}::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:rgba(201,169,110,0.3);border-radius:2px}`}</style>
       {view==='web'&&<WebApp D={D} commit={commit} onAdminClick={()=>setView('login')}/>}
       {view==='login'&&<><WebApp D={D} commit={commit} onAdminClick={()=>{}}/><LoginScreen onLogin={()=>setView('admin')} onCancel={()=>setView('web')}/></>}
       {view==='admin'&&<AdminApp D={D} commit={commit} onExit={()=>setView('web')}/>}
