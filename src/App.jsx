@@ -1665,7 +1665,7 @@ function WebApp({D, commit, onAdminClick}) {
           <div style={{fontFamily:"'Playfair Display',serif",fontSize:26,fontWeight:700,color:WEB.gold,marginBottom:8}}>✦ ShinyCandle</div>
           <div style={{fontSize:13,marginBottom:16}}>Moroccan Hair Spa & Hammam · Barcelona</div>
           <div style={{display:'flex',justifyContent:'center',gap:32,flexWrap:'wrap',fontSize:12,marginBottom:20}}>
-            {[['📍','C/ Exemple 123, Barcelona'],['📞','+34 93 123 45 67'],['🕐','Lun–Sáb 9:00–19:00'],['✉','info@shinycandle.es']].map(([i,t])=><span key={t}>{i} {t}</span>)}
+            {[['📍','C/ Sant Antoni Maria Claret 79, Barcelona'],['📞','+34 605 010 487'],['🕐','Lun–Sáb 10:00–21:00'],['✉','shinycandle.clients@gmail.com']].map(([i,t])=><span key={t}>{i} {t}</span>)}
           </div>
           <div style={{fontSize:11,color:'rgba(253,246,236,0.25)'}}>© 2026 ShinyCandle ✦ Barcelona</div>
         </div>
