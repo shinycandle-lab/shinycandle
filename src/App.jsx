@@ -1660,7 +1660,7 @@ function WebApp({D, commit, onAdminClick}) {
       {booking&&<BookingModal D={D} commit={commit} onClose={()=>setBooking(null)}/>}
       {checkout&&<CheckoutModal cart={cart} D={D} commit={commit} onClose={()=>setCheckout(false)} onDone={()=>setCart([])}/>}
 
-      <footer style={{background:WEB.dark,color:'rgba(253,246,236,0.55)',padding:'44px 24px 28px',marginTop:60}}>
+      <footer style={{background:WEB.dark,color:'#0D0A08',padding:'44px 24px 28px',marginTop:60}}>
         <div style={{maxWidth:1100,margin:'0 auto',textAlign:'center'}}>
          <div onClick={()=>setNav('inicio')} style={{cursor:'pointer',letterSpacing:'0.25em',fontFamily:"'Cormorant Garamond',serif",fontWeight:300,fontSize:20,background:'linear-gradient(90deg,#C9A96E,#F0D9A0,#C9A96E)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',backgroundClip:'text'}}>SHINY<span style={{fontWeight:600}}>C</span>ANDLE</div>
           <div style={{fontSize:13,marginBottom:16}}>Moroccan Hair Spa & Hammam · Barcelona</div>
