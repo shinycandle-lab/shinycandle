@@ -95,7 +95,7 @@ const SEED = {
 // ═══════════════════════════════════════════════════════════════════════════════
 // TEMAS — web (crema) y admin (oscuro)
 // ═══════════════════════════════════════════════════════════════════════════════
-const WEB = {bg:'#FDFAF6',sf:'#FFFFFF',bd:'rgba(0,0,0,0.07)',gold:'#B8924A',dark:'#1A1410',text:'#2C2419',muted:'#7C6B5A',light:'#F5EFE6',sand:'#EDE0CE',teal:'#1D6B5F'};
+const WEB = {bg:'#0D0A08',sf:'#1A1210',sf2:'#231815',bd:'rgba(201,169,110,0.15)',gold:'#C9A96E',dark:'#F0E8DA',text:'#E8DDD0',muted:'#8A7A6A',light:'#1F1610',sand:'#2A1E15',teal:'#2A7A6F',terra:'#C4622D'};
 const ADM = {bg:'#0B0B0B',sf:'#141414',sf2:'#1D1D1D',bd:'rgba(201,169,110,0.12)',gold:'#C9A96E',teal:'#2A7A6F',terra:'#C4622D',text:'#F0EBE0',muted:'#7A7570'};
 
 const SL = {confirmed:'Confirmada',pending:'Pendiente',completed:'Completada',cancelled:'Cancelada'};
