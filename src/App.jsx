@@ -1590,7 +1590,7 @@ function WebApp({D, commit, onAdminClick}) {
         </div>
         <div style={{background:WEB.gold,padding:'16px 24px'}}>
           <div style={{maxWidth:1100,margin:'0 auto',display:'flex',justifyContent:'center',gap:48,flexWrap:'wrap'}}>
-            {[['📍','C/ Exemple 123, Barcelona'],['📞','+34 93 123 45 67'],['🕐','Lun–Sáb · 9:00–19:00'],['🌿','Ingredientes 100% naturales']].map(([ic,t])=><div key={t} style={{display:'flex',alignItems:'center',gap:8,color:'#fff',fontSize:13,fontWeight:500}}><span>{ic}</span><span>{t}</span></div>)}
+            {[['📍','C/ Sant Antoni Maria Claret 79, Barcelona'],['📞','+34 605 010 487'],['🕐','Lun–Sáb · 10:00–21:00'],['🌿','Ingredientes Naturales de origen Marroqui']].map(([ic,t])=><div key={t} style={{display:'flex',alignItems:'center',gap:8,color:'#fff',fontSize:13,fontWeight:500}}><span>{ic}</span><span>{t}</span></div>)}
           </div>
         </div>
         <div style={{maxWidth:1100,margin:'0 auto',padding:'64px 24px'}}>
