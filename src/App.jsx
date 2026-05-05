@@ -1996,7 +1996,7 @@ export default function App(){
   );
   return(
     <>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Nunito:wght@300;400;500;600&display=swap');*{box-sizing:border-box;margin:0;padding:0}select option{background:#1D1D1D}::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:rgba(201,169,110,0.3);border-radius:2px}`}</style>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Nunito:wght@300;400;500;600&display=swap')
       {view==='web'&&<WebApp D={D} commit={commit} onAdminClick={()=>setView('login')}/>}
       {view==='login'&&<><WebApp D={D} commit={commit} onAdminClick={()=>{}}/><LoginScreen onLogin={()=>setView('admin')} onCancel={()=>setView('web')}/></>}
       {view==='admin'&&<AdminApp D={D} commit={commit} onExit={()=>setView('web')}/>}
