@@ -1558,7 +1558,7 @@ function WebApp({D, commit, onAdminClick}) {
       {/* NAV */}
       <nav style={{position:'sticky',top:0,zIndex:50,background:'rgba(253,250,246,0.96)',backdropFilter:'blur(14px)',borderBottom:`1px solid ${WEB.bd}`,padding:'0 24px'}}>
         <div style={{maxWidth:1100,margin:'0 auto',display:'flex',alignItems:'center',justifyContent:'space-between',height:62}}>
-          <img src="/4.png" alt="ShinyCandle" style={{height:38,cursor:'pointer',objectFit:'contain'}} onClick={()=>setNav('inicio')}/>
+          <div onClick={()=>setNav('inicio')} style={{cursor:'pointer',letterSpacing:'0.25em',fontFamily:"'Cormorant Garamond',serif",fontWeight:300,fontSize:20,background:'linear-gradient(90deg,#C9A96E,#F0D9A0,#C9A96E)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',backgroundClip:'text'}}>SHINY<span style={{fontWeight:600}}>C</span>ANDLE</div>
           <div style={{display:'flex',gap:4}}>
             {[['inicio','Inicio'],['servicios','Servicios'],['productos','Tienda'],['resenas','Reseñas']].map(([k,l])=>(
               <button key={k} onClick={()=>setNav(k)} style={{padding:'8px 14px',border:'none',background:nav===k?WEB.light:'transparent',color:nav===k?WEB.gold:WEB.muted,borderRadius:20,cursor:'pointer',fontSize:13,fontWeight:500,fontFamily:'inherit',transition:'all .2s'}}>{l}</button>
@@ -1662,7 +1662,7 @@ function WebApp({D, commit, onAdminClick}) {
 
       <footer style={{background:WEB.dark,color:'rgba(253,246,236,0.55)',padding:'44px 24px 28px',marginTop:60}}>
         <div style={{maxWidth:1100,margin:'0 auto',textAlign:'center'}}>
-          <div style={{fontFamily:"'Playfair Display',serif",fontSize:26,fontWeight:700,color:WEB.gold,marginBottom:8}}>✦ ShinyCandle</div>
+         <div onClick={()=>setNav('inicio')} style={{cursor:'pointer',letterSpacing:'0.25em',fontFamily:"'Cormorant Garamond',serif",fontWeight:300,fontSize:20,background:'linear-gradient(90deg,#C9A96E,#F0D9A0,#C9A96E)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',backgroundClip:'text'}}>SHINY<span style={{fontWeight:600}}>C</span>ANDLE</div>
           <div style={{fontSize:13,marginBottom:16}}>Moroccan Hair Spa & Hammam · Barcelona</div>
           <div style={{display:'flex',justifyContent:'center',gap:32,flexWrap:'wrap',fontSize:12,marginBottom:20}}>
             {[['📍','C/ Sant Antoni Maria Claret 79, Barcelona'],['📞','+34 605 010 487'],['🕐','Lun–Sáb 10:00–21:00'],['✉','shinycandle.clients@gmail.com']].map(([i,t])=><span key={t}>{i} {t}</span>)}
