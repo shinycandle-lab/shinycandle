@@ -1558,7 +1558,7 @@ function WebApp({D, commit, onAdminClick}) {
       {/* NAV */}
       <nav style={{position:'sticky',top:0,zIndex:50,background:'rgba(253,250,246,0.96)',backdropFilter:'blur(14px)',borderBottom:`1px solid ${WEB.bd}`,padding:'0 24px'}}>
         <div style={{maxWidth:1100,margin:'0 auto',display:'flex',alignItems:'center',justifyContent:'space-between',height:62}}>
-          <div style={{fontFamily:"'Playfair Display',serif",fontSize:22,fontWeight:700,color:WEB.dark,cursor:'pointer',letterSpacing:.3}} onClick={()=>setNav('inicio')}>✦ ShinyCandle</div>
+          <img src="/4.png" alt="ShinyCandle" style={{height:38,cursor:'pointer',objectFit:'contain'}} onClick={()=>setNav('inicio')}/>
           <div style={{display:'flex',gap:4}}>
             {[['inicio','Inicio'],['servicios','Servicios'],['productos','Tienda'],['resenas','Reseñas']].map(([k,l])=>(
               <button key={k} onClick={()=>setNav(k)} style={{padding:'8px 14px',border:'none',background:nav===k?WEB.light:'transparent',color:nav===k?WEB.gold:WEB.muted,borderRadius:20,cursor:'pointer',fontSize:13,fontWeight:500,fontFamily:'inherit',transition:'all .2s'}}>{l}</button>
