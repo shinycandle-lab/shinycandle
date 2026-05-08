@@ -4,7 +4,7 @@ import { LayoutDashboard, Calendar, Users, Sparkles, Package, Archive, Truck, Do
 // ═══════════════════════════════════════════════════════════════════════════════
 // STORAGE — una sola clave, un solo objeto
 // ═══════════════════════════════════════════════════════════════════════════════
-import { createClient } from '@supabase/supabase-js';
+const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm');
 
 const SUPABASE_URL = 'https://xodotpzocxxuiapiujpc.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvZG90cHpvY3h4dWlhcGl1anBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5Njc0NTksImV4cCI6MjA5MzU0MzQ1OX0.-7Vg6PRthrOdM9GFA5GJYPFgNfrKx1AQLxrO7RqTklM';
