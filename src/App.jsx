@@ -2020,6 +2020,7 @@ export default function App(){
   const lastSave=useRef(0);
   const load=useCallback(async()=>{
     if(Date.now()-lastSave.current<4000)return;
+    await migrateFromLocalStorage();
     const saved=await dbRead();
     if(saved)setD(saved);
     else{await dbWrite(SEED);setD(SEED);}
