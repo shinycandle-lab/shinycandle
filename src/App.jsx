@@ -4,10 +4,52 @@ import { LayoutDashboard, Calendar, Users, Sparkles, Package, Archive, Truck, Do
 // ═══════════════════════════════════════════════════════════════════════════════
 // STORAGE — una sola clave, un solo objeto
 // ═══════════════════════════════════════════════════════════════════════════════
-const KEY = 'sc:v6';
-const dbRead  = async () => { try { const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : null; } catch(e) { return null; } };
-const dbWrite = async d  => { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch(e) {} };
+import { createClient } from '@supabase/supabase-js';
 
+const SUPABASE_URL = 'https://xodotpzocxxuiapiujpc.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvZG90cHpvY3h4dWlhcGl1anBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5Njc0NTksImV4cCI6MjA5MzU0MzQ1OX0.-7Vg6PRthrOdM9GFA5GJYPFgNfrKx1AQLxrO7RqTklM';
+const supabase     = createClient(SUPABASE_URL, SUPABASE_KEY);
+const STORE_KEY    = 'sc:v6';
+
+const dbRead = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('shinycandle_store')
+      .select('data')
+      .eq('key', STORE_KEY)
+      .maybeSingle();
+    if (error || !data) return null;
+    return data.data;
+  } catch (e) { return null; }
+};
+
+const dbWrite = async (d) => {
+  try {
+    await supabase
+      .from('shinycandle_store')
+      .upsert(
+        { key: STORE_KEY, data: d },
+        { onConflict: 'key' }
+      );
+  } catch (e) {}
+};
+
+const migrateFromLocalStorage = async () => {
+  try {
+    const local = localStorage.getItem('sc:v6');
+    if (!local) return;
+    const parsed = JSON.parse(local);
+    const { data } = await supabase
+      .from('shinycandle_store')
+      .select('key')
+      .eq('key', STORE_KEY)
+      .maybeSingle();
+    if (!data) {
+      await dbWrite(parsed);
+    }
+    localStorage.removeItem('sc:v6');
+  } catch (e) {}
+};
 // ═══════════════════════════════════════════════════════════════════════════════
 // UTILS
 // ═══════════════════════════════════════════════════════════════════════════════
