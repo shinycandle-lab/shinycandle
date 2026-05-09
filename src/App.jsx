@@ -1,10 +1,10 @@
+import { createClient } from '@supabase/supabase-js';
 import { useState, useEffect, useCallback, useRef } from "react";
 import { LayoutDashboard, Calendar, Users, Sparkles, Package, Archive, Truck, DollarSign, UserCheck, Plus, Edit2, Trash2, Check, X, Search, AlertTriangle, TrendingUp, Star, ChevronLeft, ChevronRight, CreditCard, Banknote, Smartphone, ArrowLeftRight, ShoppingBag, Minus, LogOut, Lock, FileText, BarChart2, Clock, Paperclip, Ban } from "lucide-react";
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // STORAGE — una sola clave, un solo objeto
 // ═══════════════════════════════════════════════════════════════════════════════
-const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm');
 
 const SUPABASE_URL = 'https://xodotpzocxxuiapiujpc.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvZG90cHpvY3h4dWlhcGl1anBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5Njc0NTksImV4cCI6MjA5MzU0MzQ1OX0.-7Vg6PRthrOdM9GFA5GJYPFgNfrKx1AQLxrO7RqTklM';
