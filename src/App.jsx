@@ -1574,22 +1574,26 @@ function WebApp({D, commit, onAdminClick}) {
   const reviews = [...(D.reviews||[]),...googleReviews];
 
   // Cargar reseñas de Google Business si están configuradas
-  useEffect(()=>{
-    const {googlePlaceId,googleApiKey}=D.settings||{};
-    if(!googlePlaceId||!googleApiKey)return;
-    const url=`https://corsproxy.io/?https://maps.googleapis.com/maps/api/place/details/json?place_id=${googlePlaceId}&fields=reviews&language=es&key=${googleApiKey}`;
-    fetch(url).then(r=>r.json()).then(data=>{
-      if(data.result?.reviews){
-        const mapped=data.result.reviews.map((r,i)=>({
-          id:`g${i}`,name:r.author_name,rating:r.rating,
-          text:r.text,service:'',date:new Date(r.time*1000).toISOString().split('T')[0],
-          avatar:r.profile_photo_url,source:'google'
-        }));
-        setGoogleReviews(mapped);
-      }
-    }).catch(()=>{});
-  },[D.settings?.googlePlaceId,D.settings?.googleApiKey]);
-
+ useEffect(()=>{
+  const {googlePlaceId,googleApiKey}=D.settings||{};
+  if(!googlePlaceId||!googleApiKey)return;
+  fetch('https://xodotpzocxxuiapiujpc.supabase.co/functions/v1/google-reviews',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvZG90cHpvY3h4dWlhcGl1anBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5Njc0NTksImV4cCI6MjA5MzU0MzQ1OX0.-7Vg6PRthrOdM9GFA5GJYPFgNfrKx1AQLxrO7RqTklM'},
+    body:JSON.stringify({placeId:googlePlaceId,apiKey:googleApiKey})
+  })
+  .then(r=>r.json())
+  .then(d=>{
+    if(!d.result?.reviews)return;
+    setGoogleReviews(d.result.reviews.map((r,i)=>({
+      id:`g${i}`,name:r.author_name,rating:r.rating,
+      text:r.text,service:'',
+      date:new Date(r.time*1000).toISOString().split('T')[0],
+      avatar:r.profile_photo_url,source:'google'
+    })));
+  })
+  .catch(()=>{});
+},[D.settings?.googlePlaceId,D.settings?.googleApiKey]);
   const addCart = p => { setCart(c=>{const e=c.find(i=>i.id===p.id);return e?c.map(i=>i.id===p.id?{...i,qty:i.qty+1}:i):[...c,{...p,qty:1}];}); setAdded(p.id); setTimeout(()=>setAdded(null),1400); };
   const updCart = (id,d) => setCart(c=>c.map(i=>i.id===id?{...i,qty:Math.max(0,i.qty+d)}:i).filter(i=>i.qty>0));
   const cartTotal = cart.reduce((s,i)=>s+i.price*i.qty,0);
