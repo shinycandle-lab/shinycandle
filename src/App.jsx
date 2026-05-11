@@ -1585,7 +1585,7 @@ function WebApp({D, commit, onAdminClick}) {
   .then(r=>r.json())
   .then(d=>{
     if(!d.result?.reviews)return;
-    setGoogleReviews(d.result.reviews.map((r,i)=>({
+    setGoogleReviews(d.result.reviews.filter(r=>r.rating>=4).map((r,i)=>({
       id:`g${i}`,name:r.author_name,rating:r.rating,
       text:r.text,service:'',
       date:new Date(r.time*1000).toISOString().split('T')[0],
