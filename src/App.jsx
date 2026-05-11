@@ -126,12 +126,7 @@ const SEED = {
   fichajes:[],
   documents:[],
   settings:{googlePlaceId:'',googleApiKey:''},
-  reviews:[
-    {id:1,name:'Sofía M.',rating:5,text:'Increíble experiencia. El hammam fue espectacular, nunca me había sentido tan relajada.',service:'Hammam Tradicional',date:'2026-04-20'},
-    {id:2,name:'Laura G.',rating:5,text:'La keratina marroquí transformó mi cabello completamente. Muy profesionales.',service:'Keratina Marroquí',date:'2026-04-15'},
-    {id:3,name:'María R.',rating:5,text:'El masaje fue exactamente lo que necesitaba. Los aceites huelen maravillosamente.',service:'Masaje Relajante',date:'2026-04-10'},
-    {id:4,name:'Carmen L.',rating:5,text:'Me hice el ritual novia y quedé enamorada. Todo perfecto desde el trato hasta el resultado.',service:'Ritual Novia',date:'2026-04-05'},
-  ],
+  reviews:[],
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
