@@ -56,7 +56,7 @@ const migrateFromLocalStorage = async () => {
 const fmt  = n => `${(+n||0).toFixed(2)}€`;
 const tod  = () => new Date().toISOString().split('T')[0];
 const nid  = a => a?.length ? Math.max(...a.map(x=>+x.id||0))+1 : 1;
-const ADMIN_PASS = '1234'; // cambiar a la contraseña deseada
+const ADMIN_PASS = '4862'; // cambiar a la contraseña deseada
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // SEED
@@ -1346,8 +1346,8 @@ function FacturaModal({appt,cierreData,D,onClose}){
   const num = `SC-${Date.now().toString().slice(-6)}`;
   const biz = {
     name:'ShinyCandle', subtitle:'Moroccan Hair Spa & Hammam',
-    address:'C/ Exemple 123, Barcelona', nif:'B-12345678',
-    email:'info@shinycandle.es', tel:'+34 93 123 45 67',
+    address:'C/ Sant Antoni Maria Claret 79, Barcelona', nif:'26333541-J',
+    email:'shinycandle.adm@gmail.com', tel:'+34 605 010 487',
   };
   const [type,setType]=useState('ticket'); // 'ticket' | 'factura'
 
