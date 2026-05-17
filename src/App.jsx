@@ -1552,7 +1552,24 @@ function AdminPresencia({D,commit,ask}){
 
 
 // ROOT — Panel de gestión ShinyCandle
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RESPONSIVE HOOK
+// ═══════════════════════════════════════════════════════════════════════════════
+function useWindowSize(){
+  const [w,setW]=useState(typeof window!=='undefined'?window.innerWidth:1200);
+  useEffect(()=>{
+    const h=()=>setW(window.innerWidth);
+    window.addEventListener('resize',h);
+    return()=>window.removeEventListener('resize',h);
+  },[]);
+  return w;
+}
+
 function WebApp({D, commit, onAdminClick}) {
+  const screenW = useWindowSize();
+  const isMobile = screenW < 768;
+  const [menuOpen, setMenuOpen] = useState(false);
   const [nav,setNav] = useState('inicio');
   const [booking,setBooking] = useState(null); 
   const [cart,setCart] = useState([]);
@@ -1589,6 +1606,8 @@ function WebApp({D, commit, onAdminClick}) {
   })
   .catch(()=>{});
 },[D.settings?.googlePlaceId,D.settings?.googleApiKey]);
+    const goTo = (page) => { setNav(page); setMenuOpen(false); };
+
   const addCart = p => { setCart(c=>{const e=c.find(i=>i.id===p.id);return e?c.map(i=>i.id===p.id?{...i,qty:i.qty+1}:i):[...c,{...p,qty:1}];}); setAdded(p.id); setTimeout(()=>setAdded(null),1400); };
   const updCart = (id,d) => setCart(c=>c.map(i=>i.id===id?{...i,qty:Math.max(0,i.qty+d)}:i).filter(i=>i.qty>0));
   const cartTotal = cart.reduce((s,i)=>s+i.price*i.qty,0);
@@ -1597,51 +1616,74 @@ function WebApp({D, commit, onAdminClick}) {
   return (
     <div style={{minHeight:'100vh',background:WEB.bg,fontFamily:"'Nunito',sans-serif",color:WEB.text}}>
       {/* NAV */}
-      <nav style={{position:'sticky',top:0,zIndex:50,background:'rgba(253,250,246,0.96)',backdropFilter:'blur(14px)',borderBottom:`1px solid ${WEB.bd}`,padding:'0 24px'}}>
-        <div style={{maxWidth:1100,margin:'0 auto',display:'flex',alignItems:'center',justifyContent:'space-between',height:62}}>
-          <div onClick={()=>setNav('inicio')} style={{cursor:'pointer',letterSpacing:'0.25em',fontFamily:"'Cormorant Garamond',serif",fontWeight:300,fontSize:20,background:'linear-gradient(90deg,#C9A96E,#F0D9A0,#C9A96E)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',backgroundClip:'text'}}>SHINY<span style={{fontWeight:600}}>C</span>ANDLE</div>
-          <div style={{display:'flex',gap:4}}>
+      <nav style={{position:'sticky',top:0,zIndex:50,background:'rgba(253,250,246,0.97)',backdropFilter:'blur(14px)',borderBottom:`1px solid ${WEB.bd}`}}>
+        <div style={{maxWidth:1100,margin:'0 auto',display:'flex',alignItems:'center',justifyContent:'space-between',height:isMobile?56:62,padding:isMobile?'0 16px':'0 24px'}}>
+          <div onClick={()=>goTo('inicio')} style={{cursor:'pointer',letterSpacing:'0.25em',fontFamily:"'Cormorant Garamond',serif",fontWeight:300,fontSize:isMobile?17:20,background:'linear-gradient(90deg,#C9A96E,#F0D9A0,#C9A96E)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',backgroundClip:'text',flexShrink:0}}>SHINY<span style={{fontWeight:600}}>C</span>ANDLE</div>
+          {!isMobile&&<div style={{display:'flex',gap:4}}>
             {[['inicio','Inicio'],['servicios','Servicios'],['productos','Tienda'],['resenas','Reseñas']].map(([k,l])=>(
-              <button key={k} onClick={()=>setNav(k)} style={{padding:'8px 14px',border:'none',background:nav===k?WEB.light:'transparent',color:nav===k?WEB.gold:WEB.muted,borderRadius:20,cursor:'pointer',fontSize:13,fontWeight:500,fontFamily:'inherit',transition:'all .2s'}}>{l}</button>
+              <button key={k} onClick={()=>goTo(k)} style={{padding:'8px 14px',border:'none',background:nav===k?WEB.light:'transparent',color:nav===k?WEB.gold:WEB.muted,borderRadius:20,cursor:'pointer',fontSize:13,fontWeight:500,fontFamily:'inherit',transition:'all .2s'}}>{l}</button>
             ))}
-          </div>
-          <div style={{display:'flex',gap:8,alignItems:'center'}}>
+          </div>}
+          {!isMobile&&<div style={{display:'flex',gap:8,alignItems:'center'}}>
             <button onClick={()=>setShowCart(true)} style={{position:'relative',background:cartN>0?`${WEB.gold}15`:WEB.light,border:`1px solid ${cartN>0?WEB.gold:WEB.bd}`,borderRadius:12,padding:'9px 14px',cursor:'pointer',display:'flex',alignItems:'center',gap:6,color:cartN>0?WEB.gold:WEB.muted,fontWeight:600,fontSize:13,fontFamily:'inherit'}}>
               <ShoppingBag size={15}/>{cartN>0?`${cartN} · ${fmt(cartTotal)}`:'Carrito'}
               {cartN>0&&<span style={{position:'absolute',top:-6,right:-6,background:WEB.gold,color:'#fff',borderRadius:'50%',width:18,height:18,display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:700}}>{cartN}</span>}
             </button>
             <button onClick={onAdminClick} title="Panel de gestión" style={{background:WEB.light,border:`1px solid ${WEB.bd}`,borderRadius:10,padding:'9px 10px',cursor:'pointer',color:WEB.muted,display:'flex',alignItems:'center'}}><Lock size={14}/></button>
-          </div>
+          </div>}
+          {isMobile&&<div style={{display:'flex',gap:8,alignItems:'center'}}>
+            <button onClick={()=>setShowCart(true)} style={{position:'relative',background:cartN>0?`${WEB.gold}15`:WEB.light,border:`1px solid ${cartN>0?WEB.gold:WEB.bd}`,borderRadius:10,padding:'9px 11px',cursor:'pointer',display:'flex',alignItems:'center',color:cartN>0?WEB.gold:WEB.muted}}>
+              <ShoppingBag size={17}/>
+              {cartN>0&&<span style={{position:'absolute',top:-5,right:-5,background:WEB.gold,color:'#fff',borderRadius:'50%',width:17,height:17,display:'flex',alignItems:'center',justifyContent:'center',fontSize:9,fontWeight:700}}>{cartN}</span>}
+            </button>
+            <button onClick={()=>setMenuOpen(o=>!o)} style={{background:menuOpen?`${WEB.gold}15`:WEB.light,border:`1px solid ${menuOpen?WEB.gold:WEB.bd}`,borderRadius:10,padding:'9px 11px',cursor:'pointer',display:'flex',flexDirection:'column',gap:4,alignItems:'center',justifyContent:'center',width:40,height:40}}>
+              <span style={{display:'block',width:16,height:2,background:menuOpen?WEB.gold:WEB.muted,borderRadius:2,transform:menuOpen?'translateY(6px) rotate(45deg)':'none',transition:'all .25s'}}/>
+              <span style={{display:'block',width:16,height:2,background:menuOpen?'transparent':WEB.muted,borderRadius:2,opacity:menuOpen?0:1,transition:'all .25s'}}/>
+              <span style={{display:'block',width:16,height:2,background:menuOpen?WEB.gold:WEB.muted,borderRadius:2,transform:menuOpen?'translateY(-6px) rotate(-45deg)':'none',transition:'all .25s'}}/>
+            </button>
+          </div>}
         </div>
+        {isMobile&&menuOpen&&(
+          <div style={{borderTop:`1px solid ${WEB.bd}`,background:'rgba(253,250,246,0.99)',boxShadow:'0 8px 24px rgba(0,0,0,0.08)'}}>
+            {[['inicio','Inicio','🏠'],['servicios','Servicios','✨'],['productos','Tienda','🛍'],['resenas','Reseñas','⭐']].map(([k,l,ic])=>(
+              <button key={k} onClick={()=>goTo(k)} style={{display:'flex',alignItems:'center',gap:12,width:'100%',padding:'15px 20px',border:'none',background:nav===k?`${WEB.gold}10`:'transparent',color:nav===k?WEB.gold:'#3A2E28',textAlign:'left',fontSize:15,fontWeight:nav===k?600:400,cursor:'pointer',fontFamily:'inherit',borderLeft:nav===k?`3px solid ${WEB.gold}`:'3px solid transparent'}}>
+                <span style={{fontSize:18}}>{ic}</span>{l}
+              </button>
+            ))}
+            <div style={{padding:'12px 16px 16px',borderTop:`1px solid ${WEB.bd}`,marginTop:4}}>
+              <button onClick={()=>{onAdminClick();setMenuOpen(false);}} style={{width:'100%',padding:'12px',background:WEB.light,border:`1px solid ${WEB.bd}`,borderRadius:12,color:WEB.muted,fontSize:13,cursor:'pointer',fontFamily:'inherit',display:'flex',alignItems:'center',justifyContent:'center',gap:8}}><Lock size={14}/>Panel de gestión</button>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* INICIO */}
       {nav==='inicio'&&<div>
-        <div style={{background:'linear-gradient(135deg,#1A0E08,#2C1A10 50%,#1A1410)',minHeight:'82vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'60px 24px',position:'relative',overflow:'hidden'}}>
+        <div style={{background:'linear-gradient(135deg,#1A0E08,#2C1A10 50%,#1A1410)',minHeight:isMobile?'72vh':'82vh',display:'flex',alignItems:'center',justifyContent:'center',padding:isMobile?'48px 20px':'60px 24px',position:'relative',overflow:'hidden'}}>
           <div style={{position:'absolute',inset:0,backgroundImage:'radial-gradient(circle at 30% 50%,rgba(184,146,74,0.09),transparent 60%)',pointerEvents:'none'}}/>
           <div style={{textAlign:'center',maxWidth:680,position:'relative'}}>
-            <div style={{fontSize:11,letterSpacing:4,color:WEB.gold,textTransform:'uppercase',fontWeight:600,marginBottom:20}}>Moroccan Hair Spa & Hammam · Barcelona</div>
-            <h1 style={{fontFamily:"'Playfair Display',serif",fontSize:54,fontWeight:700,color:'#FDF6EC',lineHeight:1.12,marginBottom:24}}>El arte del<br/><em style={{color:WEB.gold}}>bienestar marroquí</em></h1>
-            <p style={{fontSize:17,color:'rgba(253,246,236,0.68)',lineHeight:1.8,marginBottom:38,fontWeight:300}}>Rituales auténticos con ingredientes de Marruecos.<br/>Hammam, tratamientos capilares y masajes en Barcelona.</p>
+            <div style={{fontSize:11,letterSpacing:isMobile?2:4,color:WEB.gold,textTransform:'uppercase',fontWeight:600,marginBottom:isMobile?14:20}}>Moroccan Hair Spa & Hammam · Barcelona</div>
+            <h1 style={{fontFamily:"'Playfair Display',serif",fontSize:isMobile?32:54,fontWeight:700,color:'#FDF6EC',lineHeight:1.15,marginBottom:isMobile?16:24}}>El arte del<br/><em style={{color:WEB.gold}}>bienestar marroquí</em></h1>
+            <p style={{fontSize:isMobile?14:17,color:'rgba(253,246,236,0.68)',lineHeight:1.8,marginBottom:isMobile?28:38,fontWeight:300}}>Rituales auténticos con ingredientes de Marruecos.<br/>Hammam, tratamientos capilares y masajes en Barcelona.</p>
             <div style={{display:'flex',gap:14,justifyContent:'center',flexWrap:'wrap'}}>
               <button onClick={()=>setNav('servicios')} style={{background:WEB.gold,color:'#fff',border:'none',borderRadius:14,padding:'14px 34px',fontSize:16,fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Reservar ahora</button>
               <button onClick={()=>setNav('productos')} style={{background:'transparent',color:'rgba(253,246,236,0.8)',border:'2px solid rgba(253,246,236,0.28)',borderRadius:14,padding:'13px 28px',fontSize:15,fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Tienda online</button>
             </div>
           </div>
         </div>
-        <div style={{background:WEB.gold,padding:'16px 24px'}}>
-          <div style={{maxWidth:1100,margin:'0 auto',display:'flex',justifyContent:'center',gap:48,flexWrap:'wrap'}}>
-            {[['📍','C/ Sant Antoni Maria Claret 79, Barcelona'],['📞','+34 605 010 487'],['🕐','Lun–Sáb · 10:00–21:00'],['🌿','Ingredientes Naturales de origen Marroqui']].map(([ic,t])=><div key={t} style={{display:'flex',alignItems:'center',gap:8,color:'#fff',fontSize:13,fontWeight:500}}><span>{ic}</span><span>{t}</span></div>)}
+        <div style={{background:WEB.gold,padding:isMobile?'12px 16px':'16px 24px'}}>
+          <div style={{maxWidth:1100,margin:'0 auto',display:'flex',justifyContent:'center',gap:isMobile?8:48,flexWrap:'wrap'}}>
+            {[['📍','C/ Sant Antoni Maria Claret 79, Barcelona'],['📞','+34 605 010 487'],['🕐','Lun–Sáb · 10:00–21:00'],['🌿','Ingredientes Naturales de origen Marroqui']].map(([ic,t])=><div key={t} style={{display:'flex',alignItems:'center',gap:6,color:'#fff',fontSize:isMobile?11:13,fontWeight:500}}><span>{ic}</span><span>{t}</span></div>)}
           </div>
         </div>
-        <div style={{maxWidth:1100,margin:'0 auto',padding:'64px 24px'}}>
+        <div style={{maxWidth:1100,margin:'0 auto',padding:isMobile?'40px 16px':'64px 24px'}}>
           <div style={{textAlign:'center',marginBottom:44}}><div style={{fontSize:11,letterSpacing:3,color:WEB.gold,textTransform:'uppercase',fontWeight:600,marginBottom:10}}>Nuestros rituales</div><h2 style={{fontFamily:"'Playfair Display',serif",fontSize:38,fontWeight:700,color:WEB.dark}}>Tratamientos exclusivos</h2></div>
           <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(300px,1fr))',gap:22}}>
             {svcActive.slice(0,3).map(s=><ServiceCard key={s.id} s={s} onBook={()=>setBooking(true)}/>)}
           </div>
           <div style={{textAlign:'center',marginTop:32}}><button onClick={()=>setNav('servicios')} style={{background:'transparent',color:WEB.gold,border:`2px solid ${WEB.gold}`,borderRadius:12,padding:'11px 26px',fontSize:14,fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Ver todos los servicios →</button></div>
         </div>
-        <div style={{background:WEB.sand,padding:'60px 24px'}}>
+        <div style={{background:WEB.sand,padding:isMobile?'40px 16px':'60px 24px'}}>
           <div style={{maxWidth:1100,margin:'0 auto'}}>
             <div style={{textAlign:'center',marginBottom:36}}><div style={{fontSize:11,letterSpacing:3,color:WEB.gold,textTransform:'uppercase',fontWeight:600,marginBottom:10}}>Opiniones</div><h2 style={{fontFamily:"'Playfair Display',serif",fontSize:34,fontWeight:700,color:WEB.dark}}>Clientas satisfechas ✦</h2></div>
             <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(240px,1fr))',gap:16}}>
@@ -1652,7 +1694,7 @@ function WebApp({D, commit, onAdminClick}) {
       </div>}
 
       {/* SERVICIOS */}
-      {nav==='servicios'&&<div style={{maxWidth:1100,margin:'0 auto',padding:'52px 24px'}}>
+      {nav==='servicios'&&<div style={{maxWidth:1100,margin:'0 auto',padding:isMobile?'36px 16px':'52px 24px'}}>
         <div style={{textAlign:'center',marginBottom:44}}><div style={{fontSize:11,letterSpacing:3,color:WEB.gold,textTransform:'uppercase',fontWeight:600,marginBottom:10}}>Tratamientos</div><h1 style={{fontFamily:"'Playfair Display',serif",fontSize:42,fontWeight:700,color:WEB.dark}}>Rituales de bienestar</h1></div>
         {[...new Set(svcActive.map(s=>s.category))].map(cat=>(
           <div key={cat} style={{marginBottom:44}}>
@@ -1665,7 +1707,7 @@ function WebApp({D, commit, onAdminClick}) {
       </div>}
 
       {/* TIENDA */}
-      {nav==='productos'&&<div style={{maxWidth:1100,margin:'0 auto',padding:'52px 24px'}}>
+      {nav==='productos'&&<div style={{maxWidth:1100,margin:'0 auto',padding:isMobile?'36px 16px':'52px 24px'}}>
         <div style={{textAlign:'center',marginBottom:40}}><div style={{fontSize:11,letterSpacing:3,color:WEB.gold,textTransform:'uppercase',fontWeight:600,marginBottom:10}}>Tienda online</div><h1 style={{fontFamily:"'Playfair Display',serif",fontSize:42,fontWeight:700,color:WEB.dark}}>Productos marroquíes</h1><p style={{fontSize:15,color:WEB.muted,marginTop:10}}>Los mismos ingredientes de nuestros tratamientos, para casa.</p></div>
         <div style={{display:'flex',gap:8,justifyContent:'center',flexWrap:'wrap',marginBottom:34}}>
           {cats.map(c=><button key={c} onClick={()=>setCatFilter(c)} style={{padding:'8px 20px',border:`2px solid ${catFilter===c?WEB.gold:WEB.bd}`,borderRadius:20,background:catFilter===c?`${WEB.gold}12`:WEB.sf,color:catFilter===c?WEB.gold:WEB.muted,fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>{c}</button>)}
@@ -1687,7 +1729,7 @@ function WebApp({D, commit, onAdminClick}) {
       </div>}
 
       {/* RESEÑAS */}
-      {nav==='resenas'&&<div style={{maxWidth:900,margin:'0 auto',padding:'52px 24px'}}>
+      {nav==='resenas'&&<div style={{maxWidth:900,margin:'0 auto',padding:isMobile?'36px 16px':'52px 24px'}}>
         <div style={{textAlign:'center',marginBottom:44}}><div style={{fontSize:11,letterSpacing:3,color:WEB.gold,textTransform:'uppercase',fontWeight:600,marginBottom:10}}>Opiniones</div><h1 style={{fontFamily:"'Playfair Display',serif",fontSize:42,fontWeight:700,color:WEB.dark}}>Lo que dicen nuestras clientas</h1><div style={{display:'flex',justifyContent:'center',gap:3,marginTop:14}}>{[1,2,3,4,5].map(n=><Star key={n} size={22} fill={WEB.gold} style={{color:WEB.gold}}/>)}</div><p style={{fontSize:14,color:WEB.muted,marginTop:8}}>5.0 · {reviews.length} reseñas</p></div>
         <div style={{display:'flex',flexDirection:'column',gap:14}}>
           {reviews.map(r=><ReviewCard key={r.id} r={r} full/>)}
@@ -1701,11 +1743,11 @@ function WebApp({D, commit, onAdminClick}) {
       {booking&&<BookingModal D={D} commit={commit} onClose={()=>setBooking(null)}/>}
       {checkout&&<CheckoutModal cart={cart} D={D} commit={commit} onClose={()=>setCheckout(false)} onDone={()=>setCart([])}/>}
 
-      <footer style={{background:WEB.dark,color:'#0D0A08',padding:'44px 24px 28px',marginTop:60}}>
+      <footer style={{background:WEB.dark,color:'#0D0A08',padding:isMobile?'36px 16px 24px':'44px 24px 28px',marginTop:isMobile?40:60}}>
         <div style={{maxWidth:1100,margin:'0 auto',textAlign:'center'}}>
          <div onClick={()=>setNav('inicio')} style={{cursor:'pointer',letterSpacing:'0.25em',fontFamily:"'Cormorant Garamond',serif",fontWeight:300,fontSize:20,background:'linear-gradient(90deg,#C9A96E,#F0D9A0,#C9A96E)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',backgroundClip:'text'}}>SHINY<span style={{fontWeight:600}}>C</span>ANDLE</div>
           <div style={{fontSize:13,marginBottom:16}}>Moroccan Hair Spa & Hammam · Barcelona</div>
-          <div style={{display:'flex',justifyContent:'center',gap:32,flexWrap:'wrap',fontSize:12,marginBottom:20}}>
+          <div style={{display:'flex',justifyContent:'center',gap:isMobile?10:32,flexWrap:'wrap',fontSize:isMobile?11:12,marginBottom:20}}>
             {[['📍','C/ Sant Antoni Maria Claret 79, Barcelona'],['📞','+34 605 010 487'],['🕐','Lun–Sáb 10:00–21:00'],['✉','shinycandle.clients@gmail.com']].map(([i,t])=><span key={t}>{i} {t}</span>)}
           </div>
           <div style={{fontSize:11,color:'rgba(253,246,236,0.25)'}}>© 2026 ShinyCandle ✦ Barcelona</div>
@@ -1753,7 +1795,7 @@ function CartDrawer({cart,cartTotal,updCart,onClose,onCheckout,onNav}){
   return(
     <div style={{position:'fixed',inset:0,zIndex:80}} onClick={e=>e.target===e.currentTarget&&onClose()}>
       <div style={{position:'absolute',inset:0,background:'rgba(26,20,16,0.5)'}} onClick={onClose}/>
-      <div style={{position:'absolute',right:0,top:0,bottom:0,width:360,background:WEB.sf,boxShadow:'-20px 0 60px rgba(0,0,0,0.15)',display:'flex',flexDirection:'column'}}>
+      <div style={{position:'absolute',right:0,top:0,bottom:0,width:isMobile?'100vw':'360px',maxWidth:'100vw',background:WEB.sf,boxShadow:'-20px 0 60px rgba(0,0,0,0.15)',display:'flex',flexDirection:'column'}}>
         <div style={{padding:'20px 22px',borderBottom:`1px solid ${WEB.bd}`,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
           <div style={{fontFamily:"'Playfair Display',serif",fontSize:18,fontWeight:700,color:WEB.dark}}>Tu carrito</div>
           <button onClick={onClose} style={{background:WEB.light,border:'none',borderRadius:9,padding:7,cursor:'pointer',color:WEB.muted}}><X size={15}/></button>
@@ -2038,7 +2080,7 @@ export default function App(){
   );
   return(
     <>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Nunito:wght@300;400;500;600&display=swap');*{box-sizing:border-box;margin:0;padding:0}select option{background:#1D1D1D}::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:rgba(201,169,110,0.3);border-radius:2px}`}</style>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Nunito:wght@300;400;500;600&display=swap');*{box-sizing:border-box;margin:0;padding:0}html,body{max-width:100vw;overflow-x:hidden}select option{background:#1D1D1D}::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:rgba(201,169,110,0.3);border-radius:2px}@media(max-width:767px){input,select,textarea{font-size:16px!important}}`}</style>
       {view==='web'&&<WebApp D={D} commit={commit} onAdminClick={()=>setView('login')}/>}
       {view==='login'&&<><WebApp D={D} commit={commit} onAdminClick={()=>{}}/><LoginScreen onLogin={()=>setView('admin')} onCancel={()=>setView('web')}/></>}
       {view==='admin'&&<AdminApp D={D} commit={commit} onExit={()=>setView('web')}/>}
