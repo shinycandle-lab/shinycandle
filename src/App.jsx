@@ -6,8 +6,8 @@ import { LayoutDashboard, Calendar, Users, Sparkles, Package, Archive, Truck, Do
 // STORAGE — una sola clave, un solo objeto
 // ═══════════════════════════════════════════════════════════════════════════════
 
-const SUPABASE_URL = 'https://xodotpzocxxuiapiujpc.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvZG90cHpvY3h4dWlhcGl1anBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5Njc0NTksImV4cCI6MjA5MzU0MzQ1OX0.-7Vg6PRthrOdM9GFA5GJYPFgNfrKx1AQLxrO7RqTklM';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
 const supabase     = createClient(SUPABASE_URL, SUPABASE_KEY);
 const STORE_KEY    = 'sc:v6';
 
@@ -56,7 +56,7 @@ const migrateFromLocalStorage = async () => {
 const fmt  = n => `${(+n||0).toFixed(2)}€`;
 const tod  = () => new Date().toISOString().split('T')[0];
 const nid  = a => a?.length ? Math.max(...a.map(x=>+x.id||0))+1 : 1;
-const ADMIN_PASS = '4862'; // cambiar a la contraseña deseada
+const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASS;
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // SEED
