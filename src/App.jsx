@@ -3240,6 +3240,18 @@ function WebApp({D, commit, onAdminClick}) {
   })
   .catch(()=>{});
 },[D.settings?.googlePlaceId,D.settings?.googleApiKey]);
+  useEffect(()=>{
+  if(!D)return;
+  const p=new URLSearchParams(window.location.search);
+  const sp=p.get('servicio');
+  if(!sp||booking)return;
+  if(sp==='asesoria-capilar'){
+    const found=(D.services||[]).find(s=>s.name.toLowerCase().replace(/\s/g,'').includes('asesoriacapilar')||s.name.toLowerCase().includes('asesor'));
+    const asesoria=found||{id:99901,name:'Asesoría Capilar Personalizada',duration:45,price:20,category:'Cabello',description:'Diagnóstico capilar personalizado con prescripción.',active:true,webVisible:true,allowedResources:[],variants:[]};
+    setBooking({preselected:[asesoria],startStep:2});
+    window.history.replaceState({},'',window.location.pathname);
+  }
+},[D]);
     const goTo = (page) => { setNav(page); setMenuOpen(false); };
 
   const addCart = p => { setCart(c=>{const e=c.find(i=>i.id===p.id);return e?c.map(i=>i.id===p.id?{...i,qty:i.qty+1}:i):[...c,{...p,qty:1}];}); setAdded(p.id); setTimeout(()=>setAdded(null),1400); };
@@ -3313,7 +3325,7 @@ function WebApp({D, commit, onAdminClick}) {
         <div style={{maxWidth:1100,margin:'0 auto',padding:isMobile?'40px 16px':'64px 24px'}}>
           <div style={{textAlign:'center',marginBottom:44}}><div style={{fontSize:11,letterSpacing:3,color:WEB.gold,textTransform:'uppercase',fontWeight:600,marginBottom:10}}>Nuestros rituales</div><h2 style={{fontFamily:"'Playfair Display',serif",fontSize:38,fontWeight:700,color:WEB.dark}}>Tratamientos exclusivos</h2></div>
           <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(300px,1fr))',gap:22}}>
-            {svcActive.slice(0,3).map(s=><ServiceCard key={s.id} s={s} onBook={()=>setBooking(true)}/>)}
+            {svcActive.slice(0,3).map(s=><ServiceCard key={s.id} s={s} onBook={()=>setBooking({})}/>)}
           </div>
           <div style={{textAlign:'center',marginTop:32}}><button onClick={()=>setNav('servicios')} style={{background:'transparent',color:WEB.gold,border:`2px solid ${WEB.gold}`,borderRadius:12,padding:'11px 26px',fontSize:14,fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Ver todos los servicios →</button></div>
         </div>
@@ -3334,7 +3346,7 @@ function WebApp({D, commit, onAdminClick}) {
           <div key={cat} style={{marginBottom:44}}>
             <div style={{fontSize:10,letterSpacing:3,color:WEB.gold,textTransform:'uppercase',fontWeight:600,marginBottom:18,display:'flex',alignItems:'center',gap:10}}><div style={{height:1,width:28,background:WEB.gold}}/>{cat}<div style={{height:1,flex:1,background:`${WEB.gold}30`}}/></div>
             <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(300px,1fr))',gap:20}}>
-              {svcActive.filter(s=>s.category===cat).map(s=><ServiceCard key={s.id} s={s} onBook={()=>setBooking(true)}/>)}
+              {svcActive.filter(s=>s.category===cat).map(s=><ServiceCard key={s.id} s={s} onBook={()=>setBooking({})}/>)}
             </div>
           </div>
         ))}
@@ -3397,7 +3409,7 @@ function WebApp({D, commit, onAdminClick}) {
       {showCart&&<CartDrawer cart={cart} cartTotal={cartTotal} updCart={updCart} onClose={()=>setShowCart(false)} onCheckout={()=>{setShowCart(false);setCheckout(true);}} onNav={()=>{setShowCart(false);setNav('productos');}}/>}
 
       {/* MODALES */}
-      {booking&&<BookingModal D={D} commit={commit} onClose={()=>setBooking(null)}/>}
+      {booking&&<BookingModal D={D} commit={commit} onClose={()=>setBooking(null)} initialSelSvcs={booking.preselected||[]} initialStep={booking.startStep||1}/>}
       {giftCardOpen&&<GiftCardPurchaseModal D={D} commit={commit} isMobile={isMobile} onClose={()=>setGiftCardOpen(false)}/>}
       {checkout&&<CheckoutModal cart={cart} D={D} commit={commit} onClose={()=>setCheckout(false)} onDone={()=>setCart([])}/>}
 
@@ -3486,11 +3498,11 @@ function CartDrawer({cart,cartTotal,updCart,onClose,onCheckout,onNav}){
   );
 }
 
-function BookingModal({D,commit,onClose}){
+function BookingModal({D,commit,onClose,initialSelSvcs=[],initialStep=1}){
   const svcActive=(D.services||[]).filter(s=>s.active!==false);
   // Step 1=servicios, 2=fecha, 3=hora+staff, 4=datos, 5=confirmado
-  const [step,setStep]=useState(1);
-  const [selSvcs,setSelSvcs]=useState([]);
+  const [step,setStep]=useState(initialStep);
+  const [selSvcs,setSelSvcs]=useState(initialSelSvcs);
   const [date,setDate]=useState('');
   const [staffId,setStaffId]=useState('');
   const [time,setTime]=useState('');
