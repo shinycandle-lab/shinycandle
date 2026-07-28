@@ -2162,7 +2162,7 @@ function FacturaModal({appt,cierreData,D,onClose}){
   const biz = {
     name:'ShinyCandle', subtitle:'Moroccan Hair Spa & Hammam',
     address:'C/ Sant Antoni Maria Claret 79, Barcelona', nif:'26333541-J',
-    email:'shinycandle.adm@gmail.com', tel:'+34 674 461 598',
+    email:'shinycandle.adm@gmail.com', tel:'+34 605 010 487',
   };
   const [type,setType]=useState('ticket'); // 'ticket' | 'factura'
 
@@ -2836,7 +2836,7 @@ function printGiftCard(card){
     </div>
     <div class="instructions">
       Presenta este código en C/ Sant Antoni Maria Claret 79, Barcelona<br/>
-      o úsalo al realizar tu reserva online · +34 674 461 598
+      o úsalo al realizar tu reserva online · +34 605 010 487
     </div>
   </div>
   <script>window.onload=()=>window.print()</script>
