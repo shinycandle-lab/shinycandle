@@ -337,21 +337,27 @@ const CAT_COLORS = {Hammam:'rgba(29,107,95,0.12)',Cabello:'rgba(184,146,74,0.12)
 // DISPONIBILIDAD
 // ═══════════════════════════════════════════════════════════════════════════════
 const ALL_SLOTS = ['09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00'];
-function freeSlots(date, staffId, duration, appointments, blocks) {
+function freeSlots(date, staffId, duration, appointments, blocks, staffList=[]) {
   if (!date) return ALL_SLOTS;
   const now = new Date();
   const busy = (appointments||[]).filter(a => a.date===date && (!staffId||a.staffId===+staffId) && a.status!=='cancelled');
-  // Bloqueos del terapeuta en esa fecha
+  const staffMember = staffId ? (staffList||[]).find(s=>s.id===+staffId) : null;
+  const dayOfWeek = new Date(date+'T12:00:00').getDay();
+  const daySched = staffMember?.weeklySchedule?.[dayOfWeek];
+  if(staffMember?.weeklySchedule && (!daySched || !daySched.active)) return [];
+  const workStart = daySched?.active&&daySched?.start ? (()=>{const[h,m]=daySched.start.split(':').map(Number);return h*60+m;})() : 0;
+  const workEnd = daySched?.active&&daySched?.end ? (()=>{const[h,m]=daySched.end.split(':').map(Number);return h*60+m;})() : 24*60;
   const staffBlocks = staffId ? (blocks||[]).filter(b=>{
     const sid=+staffId;
     return b.staffId===sid && b.startDate<=date && b.endDate>=date;
   }) : [];
-  // Si hay bloqueo de día completo, sin huecos
   if(staffBlocks.some(b=>b.allDay)) return [];
   return ALL_SLOTS.filter(slot => {
     const [h,m] = slot.split(':').map(Number), s=h*60+m, e=s+duration;
     if (date===tod() && s<=now.getHours()*60+now.getMinutes()+30) return false;
-    // Bloqueos por hora
+    if(staffMember?.weeklySchedule && daySched?.active){
+      if(s < workStart || e > workEnd) return false;
+    }
     if(staffBlocks.some(b=>{
       if(b.allDay)return true;
       const [bh,bm]=b.startTime.split(':').map(Number),[eh,em]=b.endTime.split(':').map(Number);
@@ -1213,7 +1219,57 @@ function ApptF({item,D,save}){
 function ClientF({item,D,save}){const[f,setF]=useState(item||{name:'',email:'',phone:'',visits:0,totalSpent:0,notes:'',lastVisit:'',createdAt:tod()});const F=k=>e=>setF(p=>({...p,[k]:e.target.value}));const s=()=>{if(!f.name)return;const arr=item?(D.clients||[]).map(c=>c.id===item.id?{...f,id:item.id}:c):[...(D.clients||[]),{...f,id:nid(D.clients||[])}];save('clients',arr);};return(<div><AFld label="Nombre" ch={<input style={inp} value={f.name} onChange={F('name')}/>}/><div style={{display:'flex',gap:10}}><AFld label="Email" ch={<input style={inp} type="email" value={f.email} onChange={F('email')}/>}/><AFld label="Teléfono" ch={<input style={inp} value={f.phone} onChange={F('phone')}/>}/></div><AFld label="Notas/Alergias" ch={<textarea style={{...inp,resize:'none'}} value={f.notes} onChange={F('notes')} rows={2}/>}/><ABtn ch={<><Check size={13}/>Guardar</>} onClick={s} sx={{width:'100%',justifyContent:'center'}}/></div>);}
 function InvF({item,D,save}){const[f,setF]=useState(item||{name:'',category:'Materia Prima',quantity:0,minQuantity:5,unit:'uds',cost:0,supplierId:null});const F=k=>e=>setF(p=>({...p,[k]:e.target.value}));const s=()=>{if(!f.name)return;const e={...f,quantity:+f.quantity,minQuantity:+f.minQuantity,cost:+f.cost};const arr=item?(D.inventory||[]).map(i=>i.id===item.id?{...e,id:item.id}:i):[...(D.inventory||[]),{...e,id:nid(D.inventory||[])}];save('inventory',arr);};return(<div><AFld label="Nombre" ch={<input style={inp} value={f.name} onChange={F('name')}/>}/><div style={{display:'flex',gap:10}}><AFld label="Categoría" ch={<select style={inp} value={f.category} onChange={F('category')}>{['Materia Prima','Consumibles','Equipamiento','Otros'].map(c=><option key={c}>{c}</option>)}</select>}/><AFld label="Unidad" ch={<input style={inp} value={f.unit} onChange={F('unit')}/>}/></div><div style={{display:'flex',gap:10}}><AFld label="Cantidad" ch={<input style={inp} type="number" value={f.quantity} onChange={F('quantity')}/>}/><AFld label="Mínimo" ch={<input style={inp} type="number" value={f.minQuantity} onChange={F('minQuantity')}/>}/><AFld label="Coste/ud" ch={<input style={inp} type="number" value={f.cost} onChange={F('cost')}/>}/></div><AFld label="Proveedor" ch={<select style={inp} value={f.supplierId||''} onChange={e=>setF(p=>({...p,supplierId:+e.target.value||null}))}><option value="">Sin proveedor</option>{(D.suppliers||[]).map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</select>}/><ABtn ch={<><Check size={13}/>Guardar</>} onClick={s} sx={{width:'100%',justifyContent:'center'}}/></div>);}
 function SuppF({item,D,save}){const[f,setF]=useState(item||{name:'',contact:'',email:'',phone:'',products:'',paymentTerms:'30 días',notes:''});const F=k=>e=>setF(p=>({...p,[k]:e.target.value}));const s=()=>{if(!f.name)return;const arr=item?(D.suppliers||[]).map(x=>x.id===item.id?{...f,id:item.id}:x):[...(D.suppliers||[]),{...f,id:nid(D.suppliers||[])}];save('suppliers',arr);};return(<div><AFld label="Empresa" ch={<input style={inp} value={f.name} onChange={F('name')}/>}/><div style={{display:'flex',gap:10}}><AFld label="Contacto" ch={<input style={inp} value={f.contact} onChange={F('contact')}/>}/><AFld label="Teléfono" ch={<input style={inp} value={f.phone} onChange={F('phone')}/>}/></div><AFld label="Email" ch={<input style={inp} type="email" value={f.email} onChange={F('email')}/>}/><div style={{display:'flex',gap:10}}><AFld label="Productos" ch={<input style={inp} value={f.products} onChange={F('products')}/>}/><AFld label="Pago" ch={<input style={inp} value={f.paymentTerms} onChange={F('paymentTerms')}/>}/></div><AFld label="Notas" ch={<textarea style={{...inp,resize:'none'}} value={f.notes} onChange={F('notes')} rows={2}/>}/><ABtn ch={<><Check size={13}/>Guardar</>} onClick={s} sx={{width:'100%',justifyContent:'center'}}/></div>);}
-function StaffF({item,D,save}){const[f,setF]=useState(item||{name:'',role:'',email:'',phone:'',schedule:'L-V 9-18h',active:true,commission:10});const F=k=>e=>setF(p=>({...p,[k]:e.target.value}));const s=()=>{if(!f.name)return;const arr=item?(D.staff||[]).map(x=>x.id===item.id?{...f,id:item.id,commission:+f.commission}:x):[...(D.staff||[]),{...f,id:nid(D.staff||[]),commission:+f.commission}];save('staff',arr);};return(<div><AFld label="Nombre" ch={<input style={inp} value={f.name} onChange={F('name')}/>}/><AFld label="Rol" ch={<input style={inp} value={f.role} onChange={F('role')}/>}/><div style={{display:'flex',gap:10}}><AFld label="Email" ch={<input style={inp} type="email" value={f.email} onChange={F('email')}/>}/><AFld label="Teléfono" ch={<input style={inp} value={f.phone} onChange={F('phone')}/>}/></div><div style={{display:'flex',gap:10}}><AFld label="Horario" ch={<input style={inp} value={f.schedule} onChange={F('schedule')}/>}/><AFld label="Comisión %" ch={<input style={inp} type="number" value={f.commission} onChange={F('commission')} min="0" max="50"/>}/></div><ABtn ch={<><Check size={13}/>Guardar</>} onClick={s} sx={{width:'100%',justifyContent:'center'}}/></div>);}
+function StaffF({item,D,save}){
+  const DEFAULT_SCHED={0:{active:false,start:'10:00',end:'21:00'},1:{active:true,start:'10:00',end:'21:00'},2:{active:true,start:'10:00',end:'21:00'},3:{active:true,start:'10:00',end:'21:00'},4:{active:true,start:'10:00',end:'21:00'},5:{active:true,start:'10:00',end:'21:00'},6:{active:true,start:'10:00',end:'14:00'}};
+  const [f,setF]=useState(item||{name:'',role:'',email:'',phone:'',schedule:'L-V 10-21h',active:true,commission:10,weeklySchedule:DEFAULT_SCHED,assignedServices:[]});
+  const F=k=>e=>setF(p=>({...p,[k]:e.target.value}));
+  const DAYS=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const updDay=(d,k,v)=>setF(p=>({...p,weeklySchedule:{...(p.weeklySchedule||DEFAULT_SCHED),[d]:{...(p.weeklySchedule?.[d]||{active:true,start:'10:00',end:'21:00'}),[k]:v}}}));
+  const toggleSvc=id=>setF(p=>({...p,assignedServices:(p.assignedServices||[]).includes(id)?(p.assignedServices||[]).filter(x=>x!==id):[...(p.assignedServices||[]),id]}));
+  const s=()=>{if(!f.name)return;const arr=item?(D.staff||[]).map(x=>x.id===item.id?{...f,id:item.id,commission:+f.commission}:x):[...(D.staff||[]),{...f,id:nid(D.staff||[]),commission:+f.commission}];save('staff',arr);};
+  const sched=f.weeklySchedule||DEFAULT_SCHED;
+  return(<div>
+    <AFld label="Nombre" ch={<input style={inp} value={f.name} onChange={F('name')}/>}/>
+    <AFld label="Rol" ch={<input style={inp} value={f.role} onChange={F('role')}/>}/>
+    <div style={{display:'flex',gap:10}}><AFld label="Email" ch={<input style={inp} type="email" value={f.email} onChange={F('email')}/>}/><AFld label="Teléfono" ch={<input style={inp} value={f.phone} onChange={F('phone')}/>}/></div>
+    <div style={{display:'flex',gap:10}}><AFld label="Comisión %" ch={<input style={inp} type="number" value={f.commission} onChange={F('commission')} min="0" max="50"/>}/></div>
+    <div style={{marginBottom:14}}>
+      <label style={{fontSize:11,color:A.muted,display:'block',marginBottom:8,letterSpacing:.5,textTransform:'uppercase'}}>📅 Horario semanal</label>
+      <div style={{border:`1px solid ${A.bd}`,borderRadius:10,overflow:'hidden'}}>
+        {DAYS.map((day,d)=>{const ds=sched[d]||{active:false,start:'10:00',end:'21:00'};return(
+          <div key={d} style={{display:'flex',alignItems:'center',gap:10,padding:'9px 12px',borderBottom:d<6?`1px solid ${A.bd}`:'none',background:ds.active?'transparent':A.sf2}}>
+            <label style={{display:'flex',alignItems:'center',gap:6,cursor:'pointer',minWidth:42}}>
+              <input type="checkbox" checked={ds.active} onChange={e=>updDay(d,'active',e.target.checked)} style={{width:15,height:15,accentColor:A.gold}}/>
+              <span style={{fontSize:12,fontWeight:600,color:ds.active?A.text:A.muted}}>{day}</span>
+            </label>
+            {ds.active?(
+              <div style={{display:'flex',alignItems:'center',gap:6,flex:1}}>
+                <input type="time" value={ds.start} onChange={e=>updDay(d,'start',e.target.value)} style={{...inp,width:'auto',flex:1,padding:'4px 8px',fontSize:12}}/>
+                <span style={{fontSize:11,color:A.muted}}>–</span>
+                <input type="time" value={ds.end} onChange={e=>updDay(d,'end',e.target.value)} style={{...inp,width:'auto',flex:1,padding:'4px 8px',fontSize:12}}/>
+              </div>
+            ):(
+              <span style={{fontSize:11,color:A.muted,flex:1}}>No trabaja</span>
+            )}
+          </div>
+        );})}
+      </div>
+    </div>
+    <div style={{marginBottom:14}}>
+      <label style={{fontSize:11,color:A.muted,display:'block',marginBottom:6,letterSpacing:.5,textTransform:'uppercase'}}>✨ Servicios que puede realizar</label>
+      <div style={{fontSize:11,color:A.muted,marginBottom:8}}>Sin selección → disponible para todos los servicios.</div>
+      <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
+        {(D.services||[]).filter(sv=>sv.active).map(sv=>{const sel=(f.assignedServices||[]).includes(sv.id);return(
+          <button key={sv.id} onClick={()=>toggleSvc(sv.id)} style={{padding:'6px 12px',border:`2px solid ${sel?A.gold:A.bd}`,borderRadius:20,background:sel?`${A.gold}15`:'transparent',color:sel?A.gold:A.muted,fontSize:11,fontWeight:600,cursor:'pointer',fontFamily:'inherit',display:'flex',alignItems:'center',gap:5}}>
+            {sel&&<Check size={10}/>}{sv.name}
+          </button>
+        );})}
+      </div>
+      {(f.assignedServices||[]).length===0&&<div style={{fontSize:11,color:A.gold,marginTop:6}}>Sin restricción — disponible para todos los servicios</div>}
+    </div>
+    <ABtn ch={<><Check size={13}/>Guardar</>} onClick={s} sx={{width:'100%',justifyContent:'center'}}/>
+  </div>);
+}
 function TxF({item,D,save}){const[f,setF]=useState(item||{date:tod(),type:'income',category:'Servicios',description:'',amount:0,method:'tarjeta'});const F=k=>e=>setF(p=>({...p,[k]:e.target.value}));const CATS={income:['Servicios','Productos','Otros ingresos'],expense:['Proveedores','Personal','Gastos fijos','Marketing','Otros']};const s=()=>{if(!f.description||!f.amount)return;const arr=item?(D.transactions||[]).map(t=>t.id===item.id?{...f,id:item.id,amount:+f.amount}:t):[...(D.transactions||[]),{...f,id:nid(D.transactions||[]),amount:+f.amount}];save('transactions',arr);};return(<div><div style={{display:'flex',gap:10}}><AFld label="Tipo" ch={<select style={inp} value={f.type} onChange={F('type')}><option value="income">Ingreso</option><option value="expense">Gasto</option></select>}/><AFld label="Fecha" ch={<input style={inp} type="date" value={f.date} onChange={F('date')}/>}/></div><div style={{display:'flex',gap:10}}><AFld label="Categoría" ch={<select style={inp} value={f.category} onChange={F('category')}>{(CATS[f.type]||[]).map(c=><option key={c}>{c}</option>)}</select>}/><AFld label="Método" ch={<select style={inp} value={f.method} onChange={F('method')}>{['tarjeta','efectivo','bizum','transferencia','domiciliación'].map(m=><option key={m}>{m}</option>)}</select>}/></div><AFld label="Descripción" ch={<input style={inp} value={f.description} onChange={F('description')}/>}/><AFld label="Importe €" ch={<input style={inp} type="number" value={f.amount} onChange={F('amount')}/>}/><ABtn ch={<><Check size={13}/>Guardar</>} onClick={s} sx={{width:'100%',justifyContent:'center'}}/></div>);}
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -3518,8 +3574,18 @@ function BookingModal({D,commit,onClose,initialSelSvcs=[],initialStep=1}){
   const selWebVariant=(svId,vId)=>setSvcVariants(p=>({...p,[svId]:vId}));
   const totalDur=selSvcs.reduce((s,sv)=>s+sv.duration,0);
   const totalPrice=selSvcs.reduce((s,sv)=>s+getEffectivePrice(sv),0);
-  const staff=(D.staff||[]).filter(s=>s.active);
-  const slots=freeSlots(date,staffId,totalDur,D.appointments||[],D.blocks||[]);
+const staff=(D.staff||[]).filter(s=>{
+    if(!s.active)return false;
+    if(!selSvcs.length)return true;
+    if(!s.assignedServices||s.assignedServices.length===0)return true;
+    return selSvcs.some(sv=>s.assignedServices.includes(sv.id));
+  });
+  const staffForDate=date?staff.filter(s=>{
+    if(!s.weeklySchedule)return true;
+    const dow=new Date(date+'T12:00:00').getDay();
+    return s.weeklySchedule[dow]?.active===true;
+  }):staff;
+  const slots=freeSlots(date,staffId,totalDur,D.appointments||[],D.blocks||[],D.staff||[]);
   const chosenStaff=staff.find(s=>s.id===+staffId);
 
   const toggleSvc=sv=>{
