@@ -1346,7 +1346,7 @@ function AperturaModal({D,commit,onClose}){
           <span style={{fontSize:13,color:A.muted}}>Saldo total</span>
           <span style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:A.gold,fontWeight:700}}>{fmt(total)}</span>
         </div>
-        <AFld label="Notas (opcional)" ch={<input style={inp} value={nota} onChange={e=>setNota(e.target.value)} placeholder="Ej. Turno mañana · Amina"/>}/>
+        <AFld label="Notas (opcional)" ch={<input style={inp} value={nota} onChange={e=>setNota(e.target.value)} placeholder="Ej. Turno mañana · Amina"/>}/>,weeklySchedule:{0:{active:false,start:'10:00',end:'21:00'},1:{active:true,start:'10:00',end:'21:00'},2:{active:true,start:'10:00',end:'21:00'},3:{active:true,start:'10:00',end:'21:00'},4:{active:true,start:'10:00',end:'21:00'},5:{active:true,start:'10:00',end:'21:00'},6:{active:true,start:'10:00',end:'14:00'}},assignedServices:[]
         <div style={{display:'flex',gap:10,marginTop:6}}>
           <ABtn ch="Cancelar" onClick={onClose} v="ghost" sx={{flex:1,justifyContent:'center'}}/>
           <ABtn ch={<><Check size={14}/>Abrir Caja</>} onClick={abrir} sx={{flex:2,justifyContent:'center'}}/>
