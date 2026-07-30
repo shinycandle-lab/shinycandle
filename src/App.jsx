@@ -253,7 +253,7 @@ const fmt  = n => `${(+n||0).toFixed(2)}€`;
 const tod  = () => new Date().toISOString().split('T')[0];
 const nid  = a => a?.length ? Math.max(...a.map(x=>+x.id||0))+1 : 1;
 const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASS;
-const DELETE_CODE = '1971';
+const DELETE_CODE = '1971'; 
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // SEED
