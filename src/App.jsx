@@ -998,7 +998,8 @@ function AdminClientes({D,commit,setModal,ask}){
       </>}/>)}
       {list.length===0&&<ABox ch={<div style={{textAlign:'center',padding:'30px 0',color:A.muted}}>Sin resultados</div>}/>}
     </div>
-    {cl&&<ABox sx={{width:260,flexShrink:0,alignSelf:'flex-start'}} ch={<><div style={{textAlign:'center',marginBottom:14}}><div style={{width:52,height:52,borderRadius:'50%',background:`${A.gold}20`,display:'flex',alignItems:'center',justifyContent:'center',color:A.gold,fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:700,margin:'0 auto 8px'}}>{cl.name[0]}</div><div style={{fontFamily:"'Playfair Display',serif",fontSize:15,fontWeight:600}}>{cl.name}</div></div>{[['Email',cl.email],['Teléfono',cl.phone],['Visitas',cl.visits],['Total',fmt(cl.totalSpent)],['Última visita',cl.lastVisit||'—']].map(([k,v])=><div key={k} style={{display:'flex',justifyContent:'space-between',fontSize:12,padding:'5px 0',borderBottom:`1px solid ${A.bd}`}}><span style={{color:A.muted}}>{k}</span><span style={{fontWeight:500}}>{v}</span></div>)}{cl.notes&&<div style={{background:A.sf2,borderRadius:8,padding:9,fontSize:12,color:A.muted,marginTop:10}}>📝 {cl.notes}</div>}{cAppts.length>0&&<><div style={{fontSize:11,color:A.muted,marginTop:12,marginBottom:6}}>Historial ({cAppts.length})</div>{cAppts.sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5).map(a=><div key={a.id} style={{display:'flex',justifyContent:'space-between',fontSize:11,padding:'4px 0',borderBottom:`1px solid ${A.bd}`}}><div><div style={{color:A.text}}>{a.serviceName}</div><div style={{color:A.muted}}>{a.date}</div></div><span style={{color:A.gold,fontWeight:700}}>{fmt(a.price)}</span></div>)}</>}<ClientDocs client={cl} D={D} commit={commit}/></>}/>}
+    {cl&&<ABox sx={{width:260,flexShrink:0,alignSelf:'flex-start'}} ch={<><div style={{textAlign:'center',marginBottom:14}}><div style={{width:52,height:52,borderRadius:'50%',background:`${A.gold}20`,display:'flex',alignItems:'center',justifyContent:'center',color:A.gold,fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:700,margin:'0 auto 8px'}}>{cl.name[0]}</div><div style={{fontFamily:"'Playfair Display',serif",fontSize:15,fontWeight:600}}>{cl.name}</div></div>{[['Email',cl.email],['Teléfono',cl.phone],['Visitas',cl.visits],['Total',fmt(cl.totalSpent)],['Última visita',cl.lastVisit||'—']].map(([k,v])=><div key={k} style={{display:'flex',justifyContent:'space-between',fontSize:12,padding:'5px 0',borderBottom:`1px solid ${A.bd}`}}><span style={{color:A.muted}}>{k}</span><span style={{fontWeight:500}}>{v}</span></div>)}{cl.notes&&<div style={{background:A.sf2,borderRadius:8,padding:9,fontSize:12,color:A.muted,marginTop:10}}>📝 {cl.notes}</div>}{cl.notes&&<div style={{background:A.sf2,borderRadius:8,padding:9,fontSize:12,color:A.muted,marginTop:10}}>📝 {cl.notes}</div>}
+<ClientAlerts client={cl} D={D} commit={commit}/>{cAppts.length>0&&<><div style={{fontSize:11,color:A.muted,marginTop:12,marginBottom:6}}>Historial ({cAppts.length})</div>{cAppts.sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5).map(a=><div key={a.id} style={{display:'flex',justifyContent:'space-between',fontSize:11,padding:'4px 0',borderBottom:`1px solid ${A.bd}`}}><div><div style={{color:A.text}}>{a.serviceName}</div><div style={{color:A.muted}}>{a.date}</div></div><span style={{color:A.gold,fontWeight:700}}>{fmt(a.price)}</span></div>)}</>}<ClientDocs client={cl} D={D} commit={commit}/></>}/>}
   </div>);
 }
 
@@ -1124,9 +1125,10 @@ function ApptF({item,D,save}){
   const empty=()=>({clientId:'',clientName:'',serviceId:'',serviceName:'',staffId:'',staffName:'',date:tod(),time:'10:00',duration:60,price:0,status:'pending',notes:'',source:'admin',deposito:false,deposito_monto:0});
   const [rows,setRows]=useState(item?[{...item}]:[empty()]);
   const [saved,setSaved]=useState(false);
+  const [rowAlerts,setRowAlerts]=useState({});
 
   const upd=(i,k,v)=>setRows(r=>r.map((x,j)=>j===i?{...x,[k]:v}:x));
-  const selC=(i,e)=>{const c=(D.clients||[]).find(c=>c.id===+e.target.value);if(c)setRows(r=>r.map((x,j)=>j===i?{...x,clientId:c.id,clientName:c.name}:x));};
+const selC=(i,e)=>{const c=(D.clients||[]).find(c=>c.id===+e.target.value);if(c){setRows(r=>r.map((x,j)=>j===i?{...x,clientId:c.id,clientName:c.name}:x));setRowAlerts(p=>({...p,[i]:(c.alerts||[]).filter(a=>a.active)}));}};
   const selS=(i,e)=>{const s=(D.services||[]).find(s=>s.id===+e.target.value);if(s)setRows(r=>r.map((x,j)=>j===i?{...x,serviceId:s.id,serviceName:s.name,price:s.price,duration:s.duration}:x));};
   const selSt=(i,e)=>{const s=(D.staff||[]).find(s=>s.id===+e.target.value);if(s)setRows(r=>r.map((x,j)=>j===i?{...x,staffId:s.id,staffName:s.name}:x));};
   const doAutoRes=(rows,i)=>{const r=rows[i];if(!r.date||!r.time||!r.serviceId)return rows;const svc=(D.services||[]).find(s=>s.id===+r.serviceId);if(!svc)return rows;const res=autoAssignResource(svc,r.date,r.time,r.duration||svc.duration,D.appointments||[],D.resources||[]);return rows.map((x,j)=>j===i?{...x,resourceId:res?.id||null,resourceName:res?.name||null}:x);};
@@ -1173,7 +1175,8 @@ function ApptF({item,D,save}){
             </div>
           </div>
 
-          <AFld label="Cliente" ch={<select style={inp} onChange={e=>selC(i,e)} value={f.clientId}><option value="">Seleccionar cliente...</option>{(D.clients||[]).map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select>}/>
+          <AFld label="Cliente" ch={<select style={inp} onChange={e=>selC(i,e)} value={f.clientId}><option value="">Seleccionar cliente...</option>{(D.clients||[]).map(c=><option key={c.id} value={c.id}>{c.name}{(c.alerts||[]).filter(a=>a.active).length>0?` ⚠️`:''}</option>)}</select>}/>
+          {(rowAlerts[i]||[]).length>0&&<div style={{marginBottom:10}}>{(rowAlerts[i]||[]).map(a=>{const t=ALERT_TYPES[a.type]||ALERT_TYPES.nota;return(<div key={a.id} style={{display:'flex',alignItems:'center',gap:8,padding:'8px 12px',borderRadius:8,background:`${t.color}18`,border:`1px solid ${t.color}55`,marginBottom:5}}><span style={{fontSize:15}}>{t.label.split(' ')[0]}</span><span style={{fontSize:12,fontWeight:700,color:t.color}}>{a.text}</span></div>);})}</div>}
 
           <div style={{display:'flex',gap:10}}>
             <AFld label="Servicio" ch={<select style={inp} onChange={e=>selSvcAuto(i,e)} value={f.serviceId}><option value="">Seleccionar servicio...</option>{(D.services||[]).filter(x=>x.active).map(x=><option key={x.id} value={x.id}>{x.name} — {fmt(x.price)}</option>)}</select>}/>
@@ -1415,9 +1418,11 @@ function AperturaModal({D,commit,onClose}){
 function ArqueoModal({D,commit,onClose}){
   const t=tod();
   const txsHoy=(D.transactions||[]).filter(x=>x.date===t&&x.type==='income');
+  const gastosHoy=(D.transactions||[]).filter(x=>x.date===t&&x.type==='expense');
+  const totalGastos=gastosHoy.reduce((s,x)=>s+x.amount,0);
   const byMethod={tarjeta:0,efectivo:0,bizum:0,transferencia:0,otro:0};
   txsHoy.forEach(tx=>{const k=byMethod.hasOwnProperty(tx.method)?tx.method:'otro';byMethod[k]+=tx.amount;});
-  const totalSistema=Object.values(byMethod).reduce((a,b)=>a+b,0);
+  const totalSistema=Object.values(byMethod).reduce((a,b)=>a+b,0)-totalGastos;
   const [conteo,setConteo]=useState({tarjeta:byMethod.tarjeta.toFixed(2),efectivo:byMethod.efectivo.toFixed(2),bizum:byMethod.bizum.toFixed(2),transferencia:byMethod.transferencia.toFixed(2)});
   const [notas,setNotas]=useState('');
   const totalContado=Object.values(conteo).reduce((s,v)=>s+(parseFloat(v)||0),0);
@@ -1449,11 +1454,18 @@ function ArqueoModal({D,commit,onClose}){
             <div style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:A.text}}>Arqueo de Caja</div>
             <div style={{fontSize:12,color:A.muted,marginTop:3}}>{new Date().toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
           </div>
-          <button onClick={onClose} style={{background:'none',border:'none',color:A.muted,cursor:'pointer'}}><X size={18}/></button>
+        <button onClick={onClose} style={{background:'none',border:'none',color:A.muted,cursor:'pointer'}}><X size={18}/></button>
         </div>
 
+        {/* Avisos de cliente */}
+        {(()=>{const cl=(D.clients||[]).find(c=>c.id===appt.clientId);const av=(cl?.alerts||[]).filter(a=>a.active);if(!av.length)return null;return(<div style={{marginBottom:14}}>{av.map(a=>{const t=ALERT_TYPES[a.type]||ALERT_TYPES.nota;return(<div key={a.id} style={{display:'flex',alignItems:'center',gap:8,padding:'8px 12px',borderRadius:8,background:`${t.color}18`,border:`1px solid ${t.color}55`,marginBottom:5}}><span style={{fontSize:16}}>{t.label.split(' ')[0]}</span><span style={{fontSize:13,fontWeight:700,color:t.color}}>{a.text}</span></div>);})}</div>);})()}
+
+        {/* Servicio(s) */}
+
         <div style={{background:A.sf2,borderRadius:10,padding:'10px 14px',marginBottom:18,display:'flex',gap:20,flexWrap:'wrap'}}>
-          <div style={{fontSize:12,color:A.muted}}>Transacciones hoy: <strong style={{color:A.text}}>{txsHoy.length}</strong></div>
+         <div style={{fontSize:12,color:A.muted}}>Transacciones hoy: <strong style={{color:A.text}}>{txsHoy.length}</strong></div>
+          <div style={{fontSize:12,color:A.muted}}>Total ingresos: <strong style={{color:A.gold}}>{fmt(Object.values(byMethod).reduce((a,b)=>a+b,0))}</strong></div>
+          {totalGastos>0&&<div style={{fontSize:12,color:A.muted}}>Gastos restados: <strong style={{color:A.terra}}>-{fmt(totalGastos)}</strong></div>}
           <div style={{fontSize:12,color:A.muted}}>Total sistema: <strong style={{color:A.gold}}>{fmt(totalSistema)}</strong></div>
         </div>
 
@@ -1823,6 +1835,50 @@ function AdminBloqueos({D,commit,ask}){
 
 // DOCUMENTOS EN FICHA DE CLIENTE
 function ClientDocs({client,D,commit}){
+  const ALERT_TYPES={alergia:{label:'🚨 Alergia',color:'#C4622D'},descuento:{label:'💰 Descuento',color:'#2A7A6F'},aviso:{label:'⚠️ Aviso',color:'#C9A96E'},nota:{label:'📝 Nota',color:'#9B7FD4'}};
+
+function ClientAlerts({client,D,commit}){
+  const [adding,setAdding]=useState(false);
+  const [newAlert,setNewAlert]=useState({type:'aviso',text:''});
+  const alerts=(client.alerts||[]);
+  const save=()=>{
+    if(!newAlert.text.trim())return;
+    const a={id:Date.now(),type:newAlert.type,text:newAlert.text.trim(),active:true,createdAt:tod()};
+    const updClients=(D.clients||[]).map(c=>c.id===client.id?{...c,alerts:[...(c.alerts||[]),a]}:c);
+    commit({...D,clients:updClients});
+    setNewAlert({type:'aviso',text:''});setAdding(false);
+  };
+  const toggle=id=>{
+    const updClients=(D.clients||[]).map(c=>c.id===client.id?{...c,alerts:(c.alerts||[]).map(a=>a.id===id?{...a,active:!a.active}:a)}:c);
+    commit({...D,clients:updClients});
+  };
+  const del=id=>{
+    const updClients=(D.clients||[]).map(c=>c.id===client.id?{...c,alerts:(c.alerts||[]).filter(a=>a.id!==id)}:c);
+    commit({...D,clients:updClients});
+  };
+  return(<div style={{marginTop:14}}>
+    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+      <div style={{fontSize:11,color:ADM.muted,fontWeight:600,letterSpacing:.5,textTransform:'uppercase'}}>Avisos ({alerts.length})</div>
+      <ABtn sz="sm" v="secondary" ch={<><Plus size={11}/>Aviso</>} onClick={()=>setAdding(true)}/>
+    </div>
+    {alerts.map(a=>{const t=ALERT_TYPES[a.type]||ALERT_TYPES.nota;return(
+      <div key={a.id} style={{display:'flex',alignItems:'center',gap:8,padding:'7px 9px',borderRadius:8,background:`${t.color}18`,border:`1px solid ${t.color}44`,marginBottom:6,opacity:a.active?1:0.45}}>
+        <span style={{fontSize:13,flexShrink:0}}>{t.label.split(' ')[0]}</span>
+        <div style={{flex:1,fontSize:12,color:ADM.text,fontWeight:a.active?600:400}}>{a.text}</div>
+        <button onClick={()=>toggle(a.id)} style={{background:'none',border:'none',cursor:'pointer',fontSize:10,color:a.active?t.color:ADM.muted,fontWeight:600,fontFamily:'inherit',flexShrink:0}}>{a.active?'ON':'OFF'}</button>
+        <button onClick={()=>del(a.id)} style={{background:'none',border:'none',cursor:'pointer',color:ADM.terra,display:'flex'}}><X size={11}/></button>
+      </div>
+    );})}
+    {adding&&<div style={{background:ADM.sf2,borderRadius:10,padding:12,marginTop:6}}>
+      <div style={{display:'flex',gap:4,flexWrap:'wrap',marginBottom:8}}>
+        {Object.entries(ALERT_TYPES).map(([k,{label,color}])=><button key={k} onClick={()=>setNewAlert(p=>({...p,type:k}))} style={{padding:'4px 9px',border:`2px solid ${newAlert.type===k?color:ADM.bd}`,borderRadius:16,background:newAlert.type===k?`${color}15`:'transparent',color:newAlert.type===k?color:ADM.muted,fontSize:10,fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>{label}</button>)}
+      </div>
+      <input style={{...inp,marginBottom:8,fontSize:12}} value={newAlert.text} onChange={e=>setNewAlert(p=>({...p,text:e.target.value}))} onKeyDown={e=>e.key==='Enter'&&save()} placeholder="Ej. Alérgica al argán, 10% descuento fidelidad..."/>
+      <div style={{display:'flex',gap:6}}><ABtn sz="sm" v="ghost" ch="Cancelar" onClick={()=>setAdding(false)}/><ABtn sz="sm" ch={<><Check size={11}/>Guardar</>} onClick={save}/></div>
+    </div>}
+    {alerts.length===0&&!adding&&<div style={{fontSize:11,color:ADM.muted,textAlign:'center',padding:'6px 0'}}>Sin avisos</div>}
+  </div>);
+}
   const [newDoc,setNewDoc]=useState({type:'diagnostico',title:'',content:''});
   const [adding,setAdding]=useState(false);
   const [preview,setPreview]=useState(null);
