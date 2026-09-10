@@ -1431,6 +1431,10 @@ const txsHoy=(D.transactions||[])
 
 const gastosHoy=(D.transactions||[])
   .filter(x=>x.date===t&&x.type==='expense');
+  const totalGastos=gastosHoy.reduce(
+  (s,x)=>s+(Number(x.amount)||0),
+  0
+);
 
 // INGRESOS separados por método
 const byMethod={
@@ -1546,8 +1550,7 @@ const diferencia=
   });
 
   onClose();
-};
-  };
+    };
 
   const MROW=(label,ico,method)=>(
     <div style={{display:'grid',gridTemplateColumns:'1fr 120px 120px',gap:12,alignItems:'center',padding:'10px 0',borderBottom:`1px solid ${A.bd}`}}>
