@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+vimport { createClient } from '@supabase/supabase-js';
 import React, { useState, useEffect, useCallback, useRef, Fragment } from "react";
 import { LayoutDashboard, Calendar, Users, Sparkles, Package, Archive, Truck, DollarSign, UserCheck, Plus, Edit2, Trash2, Check, X, Search, AlertTriangle, TrendingUp, Star, ChevronLeft, ChevronRight, CreditCard, Banknote, Smartphone, ArrowLeftRight, ShoppingBag, Minus, LogOut, Lock, FileText, BarChart2, Clock, Paperclip, Ban , Target, Flag, Award, GitBranch, Activity, Zap } from "lucide-react";
 
@@ -1417,25 +1417,217 @@ function AperturaModal({D,commit,onClose}){
 
 function ArqueoModal({D,commit,onClose}){
   const t=tod();
-  const txsHoy=(D.transactions||[]).filter(x=>x.date===t&&x.type==='income');
-  const gastosHoy=(D.transactions||[]).filter(x=>x.date===t&&x.type==='expense');
-  const totalGastos=gastosHoy.reduce((s,x)=>s+x.amount,0);
-  const byMethod={tarjeta:0,efectivo:0,bizum:0,transferencia:0,otro:0};
-  txsHoy.forEach(tx=>{const k=byMethod.hasOwnProperty(tx.method)?tx.method:'otro';byMethod[k]+=tx.amount;});
-  const totalSistema=Object.values(byMethod).reduce((a,b)=>a+b,0)-totalGastos;
-  const [conteo,setConteo]=useState({tarjeta:byMethod.tarjeta.toFixed(2),efectivo:byMethod.efectivo.toFixed(2),bizum:byMethod.bizum.toFixed(2),transferencia:byMethod.transferencia.toFixed(2)});
-  const [notas,setNotas]=useState('');
-  const totalContado=Object.values(conteo).reduce((s,v)=>s+(parseFloat(v)||0),0);
-  const diferencia=totalContado-totalSistema;
+
+// Apertura de hoy
+const aperturaHoy=(D.aperturas||[])
+  .filter(a=>a.fecha===t)
+  .sort((a,b)=>(b.ts||0)-(a.ts||0))[0]||null;
+
+const fondoInicial=aperturaHoy?.fondos?.efectivo||0;
+
+// Movimientos de hoy
+const txsHoy=(D.transactions||[])
+  .filter(x=>x.date===t&&x.type==='income');
+
+const gastosHoy=(D.transactions||[])
+  .filter(x=>x.date===t&&x.type==='expense');
+
+// INGRESOS separados por método
+const byMethod={
+  tarjeta:0,
+  efectivo:0,
+  bizum:0,
+  transferencia:0,
+  otro:0
+};
+
+txsHoy.forEach(tx=>{
+  const k=byMethod.hasOwnProperty(tx.method)?tx.method:'otro';
+  byMethod[k]+=Number(tx.amount)||0;
+});
+
+// GASTOS separados por método
+const gastosByMethod={
+  tarjeta:0,
+  efectivo:0,
+  bizum:0,
+  transferencia:0,
+  otro:0
+};
+
+gastosHoy.forEach(g=>{
+  const k=gastosByMethod.hasOwnProperty(g.method)?g.method:'otro';
+  gastosByMethod[k]+=Number(g.amount)||0;
+});
+
+// EFECTIVO REAL ESPERADO EN CAJA
+const efectivoSistema=
+  fondoInicial+
+  byMethod.efectivo-
+  gastosByMethod.efectivo;
+
+// Totales de los métodos no físicos
+const totalSistema=
+  byMethod.tarjeta+
+  byMethod.efectivo+
+  byMethod.bizum+
+  byMethod.transferencia+
+  byMethod.otro-
+  (
+    gastosByMethod.tarjeta+
+    gastosByMethod.efectivo+
+    gastosByMethod.bizum+
+    gastosByMethod.transferencia+
+    gastosByMethod.otro
+  );
+
+// Lo que se introduce manualmente al hacer el arqueo
+const [conteo,setConteo]=useState({
+  tarjeta:byMethod.tarjeta.toFixed(2),
+  efectivo:efectivoSistema.toFixed(2),
+  bizum:byMethod.bizum.toFixed(2),
+  transferencia:byMethod.transferencia.toFixed(2)
+});
+
+const [notas,setNotas]=useState('');
+
+const totalContado=Object.values(conteo)
+  .reduce((s,v)=>s+(parseFloat(v)||0),0);
+
+// Diferencia de efectivo: SOLO compara el dinero físico
+const diferencia=
+  (parseFloat(conteo.efectivo)||0)-efectivoSistema;const t=tod();
+
+// Apertura de hoy
+const aperturaHoy=(D.aperturas||[])
+  .filter(a=>a.fecha===t)
+  .sort((a,b)=>(b.ts||0)-(a.ts||0))[0]||null;
+
+const fondoInicial=aperturaHoy?.fondos?.efectivo||0;
+
+// Movimientos de hoy
+const txsHoy=(D.transactions||[])
+  .filter(x=>x.date===t&&x.type==='income');
+
+const gastosHoy=(D.transactions||[])
+  .filter(x=>x.date===t&&x.type==='expense');
+
+// INGRESOS separados por método
+const byMethod={
+  tarjeta:0,
+  efectivo:0,
+  bizum:0,
+  transferencia:0,
+  otro:0
+};
+
+txsHoy.forEach(tx=>{
+  const k=byMethod.hasOwnProperty(tx.method)?tx.method:'otro';
+  byMethod[k]+=Number(tx.amount)||0;
+});
+
+// GASTOS separados por método
+const gastosByMethod={
+  tarjeta:0,
+  efectivo:0,
+  bizum:0,
+  transferencia:0,
+  otro:0
+};
+
+gastosHoy.forEach(g=>{
+  const k=gastosByMethod.hasOwnProperty(g.method)?g.method:'otro';
+  gastosByMethod[k]+=Number(g.amount)||0;
+});
+
+// EFECTIVO REAL ESPERADO EN CAJA
+const efectivoSistema=
+  fondoInicial+
+  byMethod.efectivo-
+  gastosByMethod.efectivo;
+
+// Totales de los métodos no físicos
+const totalSistema=
+  byMethod.tarjeta+
+  byMethod.efectivo+
+  byMethod.bizum+
+  byMethod.transferencia+
+  byMethod.otro-
+  (
+    gastosByMethod.tarjeta+
+    gastosByMethod.efectivo+
+    gastosByMethod.bizum+
+    gastosByMethod.transferencia+
+    gastosByMethod.otro
+  );
+
+// Lo que se introduce manualmente al hacer el arqueo
+const [conteo,setConteo]=useState({
+  tarjeta:byMethod.tarjeta.toFixed(2),
+  efectivo:efectivoSistema.toFixed(2),
+  bizum:byMethod.bizum.toFixed(2),
+  transferencia:byMethod.transferencia.toFixed(2)
+});
+
+const [notas,setNotas]=useState('');
+
+const totalContado=Object.values(conteo)
+  .reduce((s,v)=>s+(parseFloat(v)||0),0);
+
+// Diferencia de efectivo: SOLO compara el dinero físico
+const diferencia=
+  (parseFloat(conteo.efectivo)||0)-efectivoSistema;
 
   const cerrar=()=>{
-    const cierre={
-      id:nid(D.cierres||[]),fecha:t,hora:new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}),
-      sistema:byMethod,contado:{tarjeta:+conteo.tarjeta||0,efectivo:+conteo.efectivo||0,bizum:+conteo.bizum||0,transferencia:+conteo.transferencia||0},
-      totalSistema,totalContado,diferencia,notas,transacciones:txsHoy.length
-    };
-    commit({...D,cierres:[...(D.cierres||[]),cierre]});
-    onClose();
+  const cierre={
+    id:nid(D.cierres||[]),
+    fecha:t,
+    hora:new Date().toLocaleTimeString('es-ES',{
+      hour:'2-digit',
+      minute:'2-digit'
+    }),
+    ts:Date.now(),
+
+    // Fondo con el que se abrió la caja
+    fondoInicial,
+
+    // Ingresos separados
+    sistema:byMethod,
+
+    // Gastos separados
+    gastos:gastosByMethod,
+
+    // Dinero esperado físicamente en caja
+    efectivoSistema,
+
+    // Dinero contado físicamente
+    efectivoContado:+conteo.efectivo||0,
+
+    // Diferencia real de caja
+    diferenciaEfectivo:diferencia,
+
+    // Se mantienen estos datos para compatibilidad
+    contado:{
+      tarjeta:+conteo.tarjeta||0,
+      efectivo:+conteo.efectivo||0,
+      bizum:+conteo.bizum||0,
+      transferencia:+conteo.transferencia||0
+    },
+
+    totalSistema,
+    totalContado,
+    diferencia,
+    notas,
+    transacciones:txsHoy.length
+  };
+
+  commit({
+    ...D,
+    cierres:[...(D.cierres||[]),cierre]
+  });
+
+  onClose();
+};
   };
 
   const MROW=(label,ico,method)=>(
