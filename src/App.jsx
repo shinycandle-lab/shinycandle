@@ -1,4 +1,4 @@
-vimport { createClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 import React, { useState, useEffect, useCallback, useRef, Fragment } from "react";
 import { LayoutDashboard, Calendar, Users, Sparkles, Package, Archive, Truck, DollarSign, UserCheck, Plus, Edit2, Trash2, Check, X, Search, AlertTriangle, TrendingUp, Star, ChevronLeft, ChevronRight, CreditCard, Banknote, Smartphone, ArrowLeftRight, ShoppingBag, Minus, LogOut, Lock, FileText, BarChart2, Clock, Paperclip, Ban , Target, Flag, Award, GitBranch, Activity, Zap } from "lucide-react";
 
