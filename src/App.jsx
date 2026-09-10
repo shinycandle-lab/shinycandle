@@ -1457,9 +1457,6 @@ function ArqueoModal({D,commit,onClose}){
         <button onClick={onClose} style={{background:'none',border:'none',color:A.muted,cursor:'pointer'}}><X size={18}/></button>
         </div>
 
-        {/* Avisos de cliente */}
-        {(()=>{const cl=(D.clients||[]).find(c=>c.id===appt.clientId);const av=(cl?.alerts||[]).filter(a=>a.active);if(!av.length)return null;return(<div style={{marginBottom:14}}>{av.map(a=>{const t=ALERT_TYPES[a.type]||ALERT_TYPES.nota;return(<div key={a.id} style={{display:'flex',alignItems:'center',gap:8,padding:'8px 12px',borderRadius:8,background:`${t.color}18`,border:`1px solid ${t.color}55`,marginBottom:5}}><span style={{fontSize:16}}>{t.label.split(' ')[0]}</span><span style={{fontSize:13,fontWeight:700,color:t.color}}>{a.text}</span></div>);})}</div>);})()}
-
         {/* Servicio(s) */}
 
         <div style={{background:A.sf2,borderRadius:10,padding:'10px 14px',marginBottom:18,display:'flex',gap:20,flexWrap:'wrap'}}>
