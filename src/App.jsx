@@ -2096,10 +2096,18 @@ function Bar({label,value,max,color,sub}){
 }
 
 function AdminInformes({D}){
-  const [type,setType]=useState('financiero');
+    const [type,setType]=useState('financiero');
   const [period,setPeriod]=useState('month');
+  const [dateFrom,setDateFrom]=useState(`${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}-01`);
+  const [dateTo,setDateTo]=useState(tod());
   const now=new Date(),yr=now.getFullYear(),mo=String(now.getMonth()+1).padStart(2,'0');
-  const filterDate=d=>{if(period==='today')return d===tod();if(period==='month')return d.startsWith(`${yr}-${mo}`);if(period==='year')return d.startsWith(`${yr}`);return true;};
+   const filterDate=d=>{
+    if(period==='today')return d===tod();
+    if(period==='month')return d.startsWith(`${yr}-${mo}`);
+    if(period==='year')return d.startsWith(`${yr}`);
+    if(period==='custom')return d>=dateFrom&&d<=dateTo;
+    return true;
+  };
   const txs=(D.transactions||[]).filter(t=>filterDate(t.date));
   const appts=(D.appointments||[]).filter(a=>filterDate(a.date));
   const inc=txs.filter(t=>t.type==='income');
@@ -2270,9 +2278,25 @@ function AdminInformes({D}){
         <div style={{display:'flex',gap:4,background:ADM.sf2,borderRadius:10,padding:4,flexWrap:'wrap'}}>
           {TYPES.map(([k,l])=><button key={k} onClick={()=>setType(k)} style={{padding:'7px 12px',border:'none',borderRadius:8,background:type===k?ADM.gold:'transparent',color:type===k?'#0A0A0A':ADM.muted,fontSize:12,fontWeight:600,cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}}>{l}</button>)}
         </div>
-        <div style={{display:'flex',gap:4,background:ADM.sf2,borderRadius:10,padding:4}}>
+                <div style={{display:'flex',gap:4,background:ADM.sf2,borderRadius:10,padding:4,flexWrap:'wrap'}}>
           {PERIODS.map(([k,l])=><button key={k} onClick={()=>setPeriod(k)} style={{padding:'7px 12px',border:'none',borderRadius:8,background:period===k?ADM.sf:'transparent',color:period===k?ADM.text:ADM.muted,fontSize:12,fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>{l}</button>)}
+          <button onClick={()=>setPeriod('custom')} style={{padding:'7px 12px',border:'none',borderRadius:8,background:period==='custom'?ADM.sf:'transparent',color:period==='custom'?ADM.gold:ADM.muted,fontSize:12,fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>📅 Personalizado</button>
         </div>
+        {period==='custom'&&(
+          <div style={{display:'flex',gap:10,alignItems:'center',flexWrap:'wrap',padding:'10px 14px',background:ADM.sf2,borderRadius:10,border:`1px solid ${ADM.gold}33`}}>
+            <div style={{display:'flex',alignItems:'center',gap:8}}>
+              <span style={{fontSize:12,color:ADM.muted}}>Desde</span>
+              <input type="date" value={dateFrom} onChange={e=>setDateFrom(e.target.value)} style={{...inp,width:'auto',padding:'6px 10px',fontSize:12}}/>
+            </div>
+            <div style={{display:'flex',alignItems:'center',gap:8}}>
+              <span style={{fontSize:12,color:ADM.muted}}>Hasta</span>
+              <input type="date" value={dateTo} onChange={e=>setDateTo(e.target.value)} style={{...inp,width:'auto',padding:'6px 10px',fontSize:12}}/>
+            </div>
+            <div style={{fontSize:11,color:ADM.gold}}>
+              {dateFrom&&dateTo?`${dateFrom} → ${dateTo}`:''}
+            </div>
+          </div>
+        )}
       </div>
 
       {type==='financiero'&&(()=>{
