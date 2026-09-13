@@ -3149,7 +3149,7 @@ function GiftCardPurchaseModal({D,commit,isMobile,onClose}){
     commit({...D,giftCards:[...(D.giftCards||[]),newCard]});
     setCard(newCard);setSaving(false);setStep(4);
   };
-  const METS=[{id:'bizum',label:'Bizum',ico:'📱',info:'+34 674 461 598'},{id:'transferencia',label:'Transferencia',ico:'🏦',info:'Te enviamos los datos por email'},{id:'tienda',label:'En tienda',ico:'🏪',info:'Paga al recoger o en tu próxima visita'}];
+  const METS=[{id:'bizum',label:'Bizum',ico:'📱',info:'+34 605 010 487'},{id:'transferencia',label:'Transferencia',ico:'🏦',info:'Te enviamos los datos por email'},{id:'tienda',label:'En tienda',ico:'🏪',info:'Paga al recoger o en tu próxima visita'}];
   return(
     <div style={{position:'fixed',inset:0,background:'rgba(26,20,16,0.7)',display:'flex',alignItems:isMobile?'flex-end':'center',justifyContent:'center',zIndex:100,backdropFilter:'blur(4px)',padding:isMobile?0:16}} onClick={e=>e.target===e.currentTarget&&onClose()}>
       <div style={{background:WEB.sf,borderRadius:isMobile?'22px 22px 0 0':24,width:'100%',maxWidth:540,maxHeight:isMobile?'94dvh':'92vh',overflowY:'auto',boxShadow:'0 -12px 48px rgba(0,0,0,0.25)'}}>
@@ -3542,7 +3542,7 @@ function WebApp({D, commit, onAdminClick}) {
         </div>
         <div style={{background:WEB.gold,padding:isMobile?'12px 16px':'16px 24px'}}>
           <div style={{maxWidth:1100,margin:'0 auto',display:'flex',justifyContent:'center',gap:isMobile?8:48,flexWrap:'wrap'}}>
-            {[['📍','C/ Sant Antoni Maria Claret 79, Barcelona'],['📞','+34 674 461 598'],['🕐','Lun–Sáb · 10:00–21:00'],['🌿','Ingredientes Naturales de origen Marroqui']].map(([ic,t])=><div key={t} style={{display:'flex',alignItems:'center',gap:6,color:'#fff',fontSize:isMobile?11:13,fontWeight:500}}><span>{ic}</span><span>{t}</span></div>)}
+            {[['📍','C/ Sant Antoni Maria Claret 79, Barcelona'],['📞','+34 605 010 487'],['🕐','Lun–Sáb · 10:00–21:00'],['🌿','Ingredientes Naturales de origen Marroqui']].map(([ic,t])=><div key={t} style={{display:'flex',alignItems:'center',gap:6,color:'#fff',fontSize:isMobile?11:13,fontWeight:500}}><span>{ic}</span><span>{t}</span></div>)}
           </div>
         </div>
         <div style={{maxWidth:1100,margin:'0 auto',padding:isMobile?'40px 16px':'64px 24px'}}>
@@ -3641,7 +3641,7 @@ function WebApp({D, commit, onAdminClick}) {
          <div onClick={()=>setNav('inicio')} style={{cursor:'pointer',letterSpacing:'0.25em',fontFamily:"'Cormorant Garamond',serif",fontWeight:300,fontSize:20,background:'linear-gradient(90deg,#C9A96E,#F0D9A0,#C9A96E)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',backgroundClip:'text'}}>SHINY<span style={{fontWeight:600}}>C</span>ANDLE</div>
           <div style={{fontSize:13,marginBottom:16}}>Moroccan Hair Spa & Hammam · Barcelona</div>
           <div style={{display:'flex',justifyContent:'center',gap:isMobile?10:32,flexWrap:'wrap',fontSize:isMobile?11:12,marginBottom:20}}>
-            {[['📍','C/ Sant Antoni Maria Claret 79, Barcelona'],['📞','+34 674 461 598'],['🕐','Lun–Sáb 10:00–21:00'],['✉','shinycandle.clients@gmail.com']].map(([i,t])=><span key={t}>{i} {t}</span>)}
+            {[['📍','C/ Sant Antoni Maria Claret 79, Barcelona'],['📞','+34 605 010 487'],['🕐','Lun–Sáb 10:00–21:00'],['✉','shinycandle.clients@gmail.com']].map(([i,t])=><span key={t}>{i} {t}</span>)}
           </div>
           <div style={{fontSize:11,color:'rgba(253,246,236,0.25)'}}>© 2026 ShinyCandle ✦ Barcelona</div>
         </div>
