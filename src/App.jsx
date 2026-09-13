@@ -3149,7 +3149,7 @@ function GiftCardPurchaseModal({D,commit,isMobile,onClose}){
     commit({...D,giftCards:[...(D.giftCards||[]),newCard]});
     setCard(newCard);setSaving(false);setStep(4);
   };
-  const METS=[{id:'bizum',label:'Bizum',ico:'📱',info:'+34 605 010 487'},{id:'transferencia',label:'Transferencia',ico:'🏦',info:'Te enviamos los datos por email'},{id:'tienda',label:'En tienda',ico:'🏪',info:'Paga al recoger o en tu próxima visita'}];
+  const METS=[{id:'bizum',label:'Bizum',ico:'📱',info:'+34 674 461 598'},{id:'transferencia',label:'Transferencia',ico:'🏦',info:'Te enviamos los datos por email'},{id:'tienda',label:'En tienda',ico:'🏪',info:'Paga al recoger o en tu próxima visita'}];
   return(
     <div style={{position:'fixed',inset:0,background:'rgba(26,20,16,0.7)',display:'flex',alignItems:isMobile?'flex-end':'center',justifyContent:'center',zIndex:100,backdropFilter:'blur(4px)',padding:isMobile?0:16}} onClick={e=>e.target===e.currentTarget&&onClose()}>
       <div style={{background:WEB.sf,borderRadius:isMobile?'22px 22px 0 0':24,width:'100%',maxWidth:540,maxHeight:isMobile?'94dvh':'92vh',overflowY:'auto',boxShadow:'0 -12px 48px rgba(0,0,0,0.25)'}}>
